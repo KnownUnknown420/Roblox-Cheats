@@ -616,7 +616,7 @@ bunnyHop = aD:CreateToggle("Bunny hop", function(K)
                                     g.Character:FindFirstChild("Humanoid")
                             then
                                 at = false
-                                g.Character.Humanoid.WalkSpeed = 20.5
+                                g.Character.Humanoid.WalkSpeed = 25.0
                                 at = true
                                 g.Character.Humanoid.Jump = true
                                 h.speedupdate = function()
