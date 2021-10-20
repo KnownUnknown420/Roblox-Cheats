@@ -8,8 +8,7 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AlexR
 local Window = Library:CreateWindow(Config, game:GetService("CoreGui"))
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/Pawel12d/hexagon/main/scripts/ESP.lua"))()
 
-
-
+local RainbowColor
 
 local VisualTab = Window:CreateTab("Visuals")
 local SettingsTab = Window:CreateTab("Settings")
@@ -150,7 +149,7 @@ end)
 ThirdPersonToggle:CreateKeybind("V", function(Key) end)
 
 local TPAmount = 0
-local TPSlider = SelfVisuals:CreateSlider("Amount", 0,50,nil,nil, function(Value)
+local TPSlider = SelfVisuals:CreateSlider("Amount", 5,50,nil,nil, function(Value)
 	TPAmount = Value
 end)
 
@@ -176,6 +175,41 @@ local ArmsEnable = true
 local TPArms = SelfVisuals:CreateToggle("Enable Arms",nil,nil, function(State)
 	ArmsEnable = not State
 end)
+
+
+
+
+local GunChams = VisualTab:CreateSection("Weapon Color")
+
+local GunChamsToggle = false
+local GunToggleButton =	GunChams:CreateToggle("Enable", nil, function(State)
+	GunChamsToggle = State
+end)
+
+local BackupColorGun = Color3.fromHSV(0, 0, 1)
+local GunColor = Color3.fromHSV(0, 0, 1)
+local GunColorPicker = GunChams:CreateColorpicker("Enemy Color", function(Color)
+	GunColor = Color
+	BackupColorGun = Color
+end)
+
+local ChamsMat = "Glass"
+local ChamsMatDropDown = GunChams:CreateDropdown("Material", {"Glass", "Ice", "Neon", "ForceField"}, function(Name)
+	ChamsMat = Name
+end)
+ChamsMatDropDown:SetOption("Glass")
+
+local GunTrans = 0
+local TransparancySlider = GunChams:CreateSlider("Transparancy", 0,10,nil,true, function(Value)
+	GunTrans = Value / 10
+end)
+
+local RainbowColorToggle = false
+local RainbowGunButton = GunChams:CreateToggle("Enable Rainbow Effect", nil, function(State)
+	RainbowColorToggle = State
+end)
+
+TransparancySlider:SetValue(5)--]]
 
 --Settings Tab
 local Section3 = SettingsTab:CreateSection("Menu")
@@ -233,6 +267,10 @@ local Slider3 = Section4:CreateSlider("Transparency",0,1,nil,false, function(Val
 	Window:SetBackgroundTransparency(Value)
 	BackRoundTransparencyOption = Value
 end)
+
+
+
+
 Slider3:SetValue(0)
 
 local BackRoundScaleOption
@@ -241,6 +279,13 @@ local Slider4 = Section4:CreateSlider("Tile Scale",0,1,nil,false, function(Value
 	BackRoundScaleOption = Value
 end)
 Slider4:SetValue(0.5)
+
+local RGBSettings = SettingsTab:CreateSection("RGBSettings")
+
+local RgbSpeed = 0
+local RgbSpeedSlider = RGBSettings:CreateSlider("Speed",1,20,nil,false, function(Value)
+	RgbSpeed = Value
+end)
 
 --Config Settings
 
@@ -301,8 +346,15 @@ local function Save()
 		ThirdPersonEnableJson = ThirdPerson,
 		TPAmountJson = TPAmount,
 		ScopeDisableJson = ScopeDisable,
+	
 		FovEnabledJson = FovEnabled,
-		TPArmsJson = ArmsEnable
+		TPArmsJson = ArmsEnable,
+		GunChamsToggleJson = GunChamsToggle,
+		GunColorJson = ConvertColor(GunColor),
+		ChamsMatJson = ChamsMat,
+		GunTransJson = GunTrans,
+		RainbowColorToggleJson = RainbowColorToggle,
+		RgbSpeedJson = RgbSpeed
 	}
 
 	writefile(ConfigName,game:service'HttpService':JSONEncode(Settings))
@@ -328,6 +380,10 @@ local function Load()
 	UIBackroundColor = RevertColor(Json.UIBackroundColorJson)
 	Window:SetBackgroundColor(RevertColor(Json.UIBackroundColorJson))
 	Colorpicker4:UpdateColor(RevertColor(Json.UIBackroundColorJson))
+
+	RgbSpeed = Json.RgbSpeedJson
+	RgbSpeedSlider:SetValue(Json.RgbSpeedJson)
+
 
 	--ESP
 	ESP.Enabled = Json.ESPEnabledJson
@@ -379,18 +435,20 @@ local function Load()
 	ColorEffectColorPicker:UpdateColor(RevertColor(Json.ColorCorrectionColorJson))
 	AimbientColorPicker:UpdateColor(RevertColor(Json.AmbientColorJson))
 
-	--WorldVisuals
-	ScopeDisable = Json.ScopeDisableJson
-	TPAmount = Json.TPAmountJson
-	FovValue = Json.FOVValueJson
-	FovEnabled = Json.FovEnabled
-	ThirdPerson = Json.ThirdPersonEnableJson
-	ArmsEnable = Json.TPArmsJson
+	GunChamsToggle = Json.GunChamsToggleJson
+	GunColor = RevertColor(Json.GunColorJson)
+	ChamsMat = Json.ChamsMatJson
+	GunTrans = Json.GunTransJson
+	RainbowColorToggle = Json.RainbowColorToggleJson
 
-	TPArms:SetState(Json.TPArmsJson)
+	GunToggleButton:SetState(Json.GunChamsToggleJson)
+	GunColorPicker:UpdateColor(RevertColor(Json.GunColorJson))
+	ChamsMatDropDown:SetOption(ChamsMat)
+	TransparancySlider:SetValue(Json.GunTransJson * 10)
+
+	RainbowGunButton:SetState(Json.RainbowColorToggleJson)
 
 
-	
 	print(ConfigName .." successfully loaded.")
 end
 
@@ -498,6 +556,41 @@ local chams = function()
 	end
 end
 
+workspace.CurrentCamera.ChildAdded:Connect(function(new)
+	spawn(function()
+	if new.Name == "Arms" and new:IsA("Model") then
+		for i,v in pairs(new:GetChildren()) do
+            if GunChamsToggle == true and v:IsA("BasePart") and not table.find({"Right Arm", "Left Arm", "Flash"}, v.Name) and v.Transparency ~= 1 then
+					if v:IsA("MeshPart") then v.TextureID = "" end
+					if v:FindFirstChildOfClass("SpecialMesh") then v:FindFirstChildOfClass("SpecialMesh").TextureId = "" end
+					game:GetService("RunService").RenderStepped:Connect(function()
+						if RainbowColorToggle then 
+							GunColor = RainbowColor
+						else
+							GunColor = BackupColorGun
+						end
+						v.Transparency = GunTrans
+						v.Color = GunColor
+						v.Material = ChamsMat
+					end)
+				end
+			end
+		end
+	end)
+end)
+
+local tick = tick
+local fromHSV = Color3.fromHSV
+local RunService = game:GetService("RunService")
+
+
+
+RunService:BindToRenderStep("Rainbow", 1000, function()
+	local t = RgbSpeed; 
+	local hue = tick() % t / t
+	RainbowColor = fromHSV(hue, 1, 1)
+end)
+
 local turn_on = chams
 local turn_off = function()
 	switch = false
@@ -514,50 +607,6 @@ players.PlayerAdded:connect(function(player)
 	end
 end)
 
-local target
-local m = LocalPlayer:GetMouse()
-local fartfart
-
-local mt = getrawmetatable(game)
-local oldNamecall = mt.__namecall
-local oldIndex = mt.__index
-if setreadonly then setreadonly(mt, false) else make_writeable(mt, true) end
-local namecallMethod = getnamecallmethod or get_namecall_method
-local newClose = newcclosure or function(f) return f end
-local latestshot = nil
-local bodyname = 'Head'
-local cangivecframe = 0
-
-local backtrackfolder = Instance.new('Folder',workspace)
-backtrackfolder.Name = 'backtrackfolder'
-
-mt.__namecall = newClose(function(...)
-	local method = namecallMethod()
-	local args = {...}
-	if method == "FindPartOnRayWithIgnoreList" then
-		 if target and LocalPlayer.Character and SilentAimEnable == true then
-			 args[2] = Ray.new(workspace.CurrentCamera.CFrame.Position, (target.Head.CFrame.p - workspace.CurrentCamera.CFrame.Position).unit * 500)
-		 elseif fartfart == true then
-			 args[2] = Ray.new(workspace.CurrentCamera.CFrame.Position, (m.Hit.p - workspace.CurrentCamera.CFrame.Position).unit * 500)
-		 end
-	 -- bypass start
-	 elseif tostring(method) == "InvokeServer" and tostring(args[1]) == "Hugh" then
-		 return wait(99e99)
-	 elseif tostring(method) == "FireServer" and string.find(tostring(args[1]),'{') then
-		 return wait(99e99)
-	 end
-	 -- bypass end
- return oldNamecall(unpack(args))
-end)
-if setreadonly then setreadonly(mt, true) else make_writeable(mt, false) end
-
-
-local Minvalue = BhopAmount
-local MaxValue = BhopAmount
-local Acceleration = BhopAmount
-local curVel = 16
-local isBhopping = false
-
 local function IsAlive(plr)
 	if plr and plr.Character and plr.Character.FindFirstChild(plr.Character, "Humanoid") and plr.Character.Humanoid.Health > 0 then
 		return true
@@ -567,45 +616,7 @@ local function IsAlive(plr)
 end
 
 local UserInputService = game:GetService("UserInputService")
-
-local function BhopLoop()
-	wait(0.5)
- 	Minvalue = BhopAmount
- 	MaxValue = BhopAmount
- 	Acceleration = BhopAmount
-	wait(0.5)
-	if IsAlive(LocalPlayer) then
-		LocalPlayer.Character.Humanoid.StateChanged:Connect(function(state)
-			if EnableBhop == true then
-				if UserInputService:IsKeyDown(Enum.KeyCode.Space) == false then
-					isBhopping = false
-					curVel = Minvalue
-				elseif state == Enum.HumanoidStateType.Landed and UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-					LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-				elseif state == Enum.HumanoidStateType.Jumping then
-					isBhopping = true
-					curVel = (curVel + Acceleration) >= MaxValue and MaxValue or curVel + Acceleration
-				end
-			end
-		end)
-	else
-		isBhopping = false
-	end
-end
-
 local cbClient = getsenv(LocalPlayer.PlayerGui:WaitForChild("Client"))
-
-oldNewIndex = hookfunc(getrawmetatable(game.Players.LocalPlayer.PlayerGui.Client).__newindex, newcclosure(function(self, idx, val)
-	if not checkcaller() then
-		if self.Name == "Humanoid" and idx == "WalkSpeed" and val ~= 0 and isBhopping == true then 
-			val = curVel
-		elseif self.Name == "Humanoid" and idx == "JumpPower" and val ~= 0 and JumpBug == true then
-			spawn(function() cbClient.UnCrouch() end)
-			val = val * 1.25
-		end
-	end
-    return oldNewIndex(self, idx, val)
-end))
 
 --MainLoop
 
@@ -639,13 +650,6 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	else
 		game.Players.LocalPlayer.CameraMaxZoomDistance = 0
 		game.Players.LocalPlayer.CameraMinZoomDistance = 0
-	end
-end)
-
-spawn(function()
-	while true do
-		wait(0.3)
-		BhopLoop()
 	end
 end)
 
