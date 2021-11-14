@@ -2,10 +2,12 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local character = player.Character or player.Character:Wait()
 local humanoid = character:WaitForChild("Humanoid")
-game.Players.LocalPlayer.Name:Kick("Game not supported")
 
-if humanoid.RigType ~= Enum.HumanoidRigType.R15 or Enum.HumanoidRigType.R6 then 
-    game.Players.LocalPlayer.Name:Kick("Game not supported")
+
+if humanoid.RigType == Enum.HumanoidRigType.R15 or Enum.HumanoidRigType.R6 then 
+    print("Loading...")
+else	
+	game.Players.LocalPlayer:Kick("Game not supported")
 end
 
 
@@ -470,4 +472,4 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 
-
+print("RE loaded!")
