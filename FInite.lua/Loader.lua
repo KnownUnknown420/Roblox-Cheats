@@ -159,7 +159,7 @@ local function QWELJX_fake_script() -- Inject.LocalScript
 	print(_G.whitelistedusers)
 	
 	Button.MouseButton1Down:Connect(function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/KnownUnknown420/Finite.inc/main/Main.lua"))()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/KnownUnknown420/Counter-Blox-Cheats/main/FInite.lua/Main.lua"))()
 		local NIGGERNIGGERNIGGERNIGGERNIGGERNIGGER = script.Parent.Parent.Parent.Main
 		NIGGERNIGGERNIGGERNIGGERNIGGERNIGGER:Destroy()
 	end)
