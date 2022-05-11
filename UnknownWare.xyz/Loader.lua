@@ -289,7 +289,7 @@ local function DBHXZJ_fake_script() -- InjectButton.LocalScript
 				CreateText("Connecting to Script... ", Color3.fromRGB(255, 234, 0))
 				wait(0.5)
 				spawn(function()
-					loadstring(game:HttpGet("https://raw.githubusercontent.com/KnownUnknown420/UnknownWare.xyz/main/Main.lua"))()
+					loadstring(game:HttpGet("https://raw.githubusercontent.com/KnownUnknown420/Counter-Blox-Cheats/main/UnknownWare.xyz/Main.lua"))()
 				end)
 				CreateText("Connected to Script! Injecting..." , Color3.fromRGB(38, 255, 0))
 				CreateText("All Set!, Closing in 5 Seconds.", Color3.fromRGB(38, 255, 0))
