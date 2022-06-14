@@ -1,19 +1,32 @@
+--[[
+       _
+  __ _| | ___  _ __ __ _
+ / _` | |/ _ \| '__/ _` |
+| (_| | | (_) | | | (_| |
+ \__,_|_|\___/|_|  \__,_|
+
+      alora, a free and open source Counter Blox script created by sjors, ruined by me
+
+                          alora  @ https://discord.gg/m3aMvdynrf -- https://github.com/sj0rs1/alora
+                    buy cuteware @ https://discord.gg/nyZaeASbsk -- https://www.cuteware.xyz
+
+--]]
 repeat wait() until game:IsLoaded()
-getgenv().Loading = true
-if game:GetService("CoreGui"):FindFirstChild("sjorlib") then return end
+if game:GetService("CoreGui"):FindFirstChild("sjorlib") then game:GetService("CoreGui"):FindFirstChild("sjorlib"):Destroy() end
 getgenv().error = function() end
+local ver = "1.3.45c"
 --files
-if not isfolder("UnknownWare") then
-    makefolder("UnknownWare")
+if not isfolder("alora") then
+    makefolder("alora")
 end
-if not isfolder("UnknownWare/Configs") then
-    makefolder("UnknownWare/Configs")
+if not isfolder("alora/"..tostring(game.GameId)) then
+    makefolder("alora/"..tostring(game.GameId))
 end
 --vars
-local ver = "1.0.0"
 local library,menu,tabholder = loadstring(game:HttpGet("https://raw.githubusercontent.com/KnownUnknown420/Counter-Blox-Cheats/main/UnknownWare.xyz/Library.lua"))()
 local userInputService = game:GetService("UserInputService")
 local replicatedStorage = game:GetService("ReplicatedStorage")
+local teleportService = game:GetService("TeleportService")
 local runService = game:GetService("RunService")
 local players = game:GetService("Players")
 local lighting = game:GetService("Lighting")
@@ -21,13 +34,14 @@ local localPlayer = players.LocalPlayer
 local camera = workspace.CurrentCamera
 local mouse = localPlayer:GetMouse()
 local debris = game:GetService("Debris")
+local rayIgnore = workspace.Ray_Ignore
 local client = getsenv(localPlayer.PlayerGui.Client)
-if getgenv().Loading == true then 
-    game:GetService("CoreGui"):FindFirstChild("sjorlib").Enabled = false
-end
 
-local aloraWatermark = Drawing.new("Text");aloraWatermark.Font = 2;aloraWatermark.Position = Vector2.new(50,24);aloraWatermark.Visible = false;aloraWatermark.Size = 13;aloraWatermark.Color = Color3.new(1,1,1);aloraWatermark.Outline = true
-local speclistText = Drawing.new("Text");speclistText.Font = 2;speclistText.Position = Vector2.new(8,305);speclistText.Visible = false;speclistText.Size = 13;speclistText.Color = Color3.new(1,1,1);speclistText.Outline = true
+
+local aloraWatermark = Drawing.new("Text");aloraWatermark.Font = 2;aloraWatermark.Position = Vector2.new(995,285);aloraWatermark.Visible = false;aloraWatermark.Size = 13;aloraWatermark.Color = Color3.new(1,1,1);aloraWatermark.Outline = true
+local speclistText = Drawing.new("Text");speclistText.Font = 2;speclistText.Position = Vector2.new(1100,300);speclistText.Visible = false;speclistText.Size = 13;speclistText.Color = Color3.new(1,1,1);speclistText.Outline = true
+local bombText = Drawing.new("Text");bombText.Font = 2;bombText.Position = Vector2.new(1000,300);bombText.Visible = false;bombText.Size = 13;bombText.Color = Color3.new(1,1,1);bombText.Outline = true
+
 
 
 local skyboxes = {
@@ -114,16 +128,19 @@ local skyboxes = {
 }
 
 local hitsounds = {
-    Bameware = "rbxassetid://3124331820",
-    Bell = "rbxassetid://6534947240",
-    Bubble = "rbxassetid://6534947588",
     Pick = "rbxassetid://1347140027",
-    Pop = "rbxassetid://198598793",
     Rust = "rbxassetid://1255040462",
     Skeet = "rbxassetid://5633695679",
     Neverlose = "rbxassetid://6534948092",
-    Minecraft = "rbxassetid://4018616850"
+    Minecraft = "rbxassetid://4018616850",
+    jewelxx = "rbxassetid://9717701840",
+    hexx = "rbxassetid://9717702712",
+    krxxxk = "rbxassetid://9717762690",
+    slots = "rbxassetid://9717785933",
+    sonic = "rbxassetid://9717784691"
 }
+
+
 
 local hitboxList = {
     Head = {"Head"},
@@ -137,6 +154,8 @@ function isAlive(plr)
     if not plr then plr = localPlayer end
     return plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character:FindFirstChild("Head") and plr.Character.Humanoid.Health > 0 and true or false
 end
+
+
 
 function hasProperty(ins,pro)
     return pcall(function() _=ins[pro] end)
@@ -209,7 +228,7 @@ end
 
 function isButtonDown(key)
     if string.find(tostring(key),"KeyCode") then
-        return userInputService:IsKeyDown(key) 
+        return userInputService:IsKeyDown(key)
     else
         for _,v in pairs(userInputService:GetMouseButtonsPressed()) do
             if v.UserInputType == key then
@@ -219,6 +238,8 @@ function isButtonDown(key)
     end
 	return false
 end
+
+
 
 function updateSkybox()
     if lighting:FindFirstChild("customsky") then
@@ -258,7 +279,7 @@ function createTracer(to,from)
         part2.Transparency = 1;part2.Position = from.Position;part2.CanCollide = false;part2.Anchored = true;part2.Parent = workspace.Debris;attachment2.Parent = part2
         beam.FaceCamera = true;beam.Color = ColorSequence.new(library.flags["tracer_color"]);beam.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1-0.5),NumberSequenceKeypoint.new(1,1-0.5)};beam.Width0 = 0.055;beam.Width1 = 0.055;beam.LightEmission = 1;beam.LightInfluence = 0;beam.Attachment0 = attachment1;beam.Attachment1 = attachment2;beam.Parent = part1
         beam2.FaceCamera = true;beam2.Color = ColorSequence.new(Color3.new(1,1,1));beam2.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0,1-0.75),NumberSequenceKeypoint.new(1,1-0.75)};beam2.Width0 = 0.025;beam2.Width1 = 0.025;beam2.LightEmission = 1;beam2.LightInfluence = 0;beam2.Attachment0 = attachment1;beam2.Attachment1 = attachment2;beam2.Parent = part1
-        
+
         spawn(function()
             wait(2)
             for i=0.5,0,-0.025 do wait()
@@ -275,7 +296,7 @@ function createTracer(to,from)
 end
 
 oldSounds = {}
-for i,v in next, localPlayer.PlayerGui.Music:GetDescendants() do -- this is MY CODE!!!!
+for i,v in next, localPlayer.PlayerGui.Music:GetDescendants() do
 	if v:IsA("Sound") then
 		if v.Name == "Lose" then
 			oldSounds["Lose"] = v.SoundId
@@ -290,6 +311,8 @@ for i,v in next, localPlayer.PlayerGui.Music:GetDescendants() do -- this is MY C
 		end
 	end
 end
+
+
 
 local espObjects = {}
 function createEsp(plr)
@@ -325,7 +348,7 @@ function createEsp(plr)
     boxinlineESP.Thickness = 1
     boxinlineESP.Color = Color3.new(0,0,0)
     boxinlineESP.Transparency = 1
-    
+
     healthbarESP.Thickness = 1
     healthbarESP.Color = Color3.fromRGB(50,220,50)
     healthbarESP.Transparency = 1
@@ -380,49 +403,10 @@ function floor(val)
     return Vector2.new(math.floor(val.X),math.floor(val.Y))
 end
 
-function updateViewmodel()
-    if camera:FindFirstChild("Arms") then
-        local arms = camera.Arms
-        for i,v in next, arms:GetChildren() do
-            if library.flags["weapon_chams"] then
-                if (v:IsA("MeshPart") or v.Name == "Part") and v.Transparency ~= 1 then
-                    if v.Name == "StatClock" then v:ClearAllChildren() end
-                    v.Color = library.flags["weapon_color"]
-                    v.Transparency = library.flags["weapon_trans"]/100
-                    v.Material = "SmoothPlastic"
-                    if hasProperty(v,"TextureID") then v.TextureID = "" end
-                end
-            end
-            if v:IsA"Model" then
-                for _i,_v in next, v:GetDescendants() do
-                    if library.flags["remove_sleeves"] and _v.Name == "Sleeve" then
-                        _v:Destroy()
-                    end
-                    if library.flags["arm_chams"] then
-                        if hasProperty(_v,"CastShadow") then _v.CastShadow = false end
-                        if _v:IsA"SpecialMesh" then
-                            local clr = library.flags["arm_color"]
-                            _v.VertexColor = Vector3.new(clr.R,clr.G,clr.B)
-                        end
-                        if _v:IsA"Part" then
-                            _v.Material = "SmoothPlastic"
-                            _v.Transparency = library.flags["arm_trans"]/100
-                            _v.Color = library.flags["arm_color"]
-                            if _v.Transparency == 1 then continue end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-
-local unlockInventory,unlocked = false,false
-local skins = {{"TKnife_Stock"},{"CTKnife_Stock"},{"TGlove_Stock"},{"CTGlove_Stock"}}
 local btInfo = {parent = nil,folder = nil}
 local preventBt = false
 local silentPart = nil
-local hookJp = nil
+
 local hookWs = nil
 local timeout = 0
 local meta = getrawmetatable(game)
@@ -430,31 +414,24 @@ setreadonly(meta,false)
 local oldNamecall = meta.__namecall
 local oldNewindex = meta.__newindex
 
-for i,v in pairs(localPlayer.PlayerGui.Client.Rarities:GetChildren()) do
-    table.insert(skins,{v.Name})
-end
+
+
 
 meta.__newindex = newcclosure(function(self,idx,val)
-    if idx == "JumpPower" and hookJp then
-        val = 22
-    end
-    return oldNewindex(self,idx,val)
-end)
+if self.Name == "Crosshair" and idx == "Visible" and val == false and localPlayer.PlayerGui.GUI.Crosshairs.Scope.Visible == false and library.flags["force_cross"] == true then
+			val = true
+		end
+		return oldNewindex(self,idx,val)
+	end)
 
 meta.__namecall = newcclosure(function(self,...)
     local args = {...}
     local method = getnamecallmethod()
 
-    if method == "Kick" then 
-        return 
+    if method == "Kick" then
+        return
     end
     if self.Name == "RemoteEvent" and typeof(args[1]) == "table" and args[1][1] == "kick" then
-        return
-    end
-    if self.Name == "FallDamage" and library.flags["fall_damage"] then
-        return
-    end
-    if self.Name == "BURNME" and library.flags["fire_damage"] then
         return
     end
     if method == "InvokeServer" and self.Name == "Hugh" then
@@ -470,11 +447,6 @@ meta.__namecall = newcclosure(function(self,...)
     end
 
     if method == "FireServer" then
-        if self.Name == "ReplicateCamera" then
-            if library.flags["AntiSpec"] == true then
-                args[1] = CFrame.new()
-            end
-        end
         if args[1] == localPlayer.UserId or string.find(tostring(args[1]),'{') then
             return
         end
@@ -488,7 +460,7 @@ meta.__namecall = newcclosure(function(self,...)
             return
         end
         if self.Name == "ApplyGun" then
-            if string.find(args[1].Name,"Banana") or string.find(args[1].Name,"Flip") then 
+            if string.find(args[1].Name,"Banana") or string.find(args[1].Name,"Flip") then
                 args[1] = replicatedStorage.Weapons[localPlayer.Status.Team.Value.." Knife"]
             end
         end
@@ -513,12 +485,29 @@ meta.__namecall = newcclosure(function(self,...)
                     hitsound.Volume = library.flags["hitsound_volume"]
                     hitsound:Destroy()
                 end
+                
+
                 if library.flags["bullet_tracer"] and localPlayer.Character and  camera:FindFirstChild("Arms") then
                     local from = camera.Arms:FindFirstChild("Flash")
                     if from then
                         createTracer(args[2],from)
                     end
                 end
+                if library.flags["bullet_imp"] == true then
+					spawn(function()
+						local bulletImpacts = Instance.new("Part")
+						bulletImpacts.Anchored = true
+						bulletImpacts.CanCollide = false
+						bulletImpacts.Material = "ForceField"
+						bulletImpacts.Color = library.flags["bullet_impcol"]
+						bulletImpacts.Size = Vector3.new(0.25, 0.25, 0.25)
+						bulletImpacts.CFrame = CFrame.new(args[2])
+						bulletImpacts.Name = "bulletImpacts"
+						bulletImpacts.Parent = camera
+						wait(3)
+						bulletImpacts:Destroy()
+					end)
+				end
             end)
             if btInfo.parent and not preventBt then
                 args[1] = btInfo.parent.Head
@@ -530,24 +519,7 @@ meta.__namecall = newcclosure(function(self,...)
                 end)
             end
         end
-        if unlockInventory then
-            if #self.Name == 38 then
-                if not unlocked then
-                    unlocked = true
-                    for i,v in next, skins do
-                        local doSkip
-                        for _i,_v in next, args[1] do
-                            if v[1] == _v[1] then
-                                doSkip = true
-                            end
-                        end
-                        if not doSkip then
-                            table.insert(args[1], v)
-                        end
-                    end
-                end
-                return
-            end
+
             if self.Name == "DataEvent" and args[1][4] then
                 local currentSkin = string.split(args[1][4][1],"_")[2]
                 local name = args[1][3]
@@ -558,21 +530,22 @@ meta.__namecall = newcclosure(function(self,...)
                     localPlayer["SkinFolder"][args[1][2].."Folder"][name].Value = currentSkin
                 end
             end
-        end   
     end
     return oldNamecall(self,unpack(args))
 end)
 
 local aimbotTab = library:addTab("Aimbot")
 local visualsTab = library:addTab("Visuals")
+local skinsTab = library:addTab("Skins")
 local miscTab = library:addTab("Misc")
 local configTab = library:addTab("Settings")
 
-local OptimsationGroup = configTab:createGroup(1)
-OptimsationGroup:addSlider({text = "Chams refresh rate (Seconds)",flag = "ChamsDelay",min = 0,max = 10,value = 1})
-
 local configGroup = configTab:createGroup(0)
-configGroup:addColorpicker({text = "Menu Accent",flag = "menu_accent",ontop = true,color = Color3.fromRGB(100,60,80),callback = function(val)
+local configGroup1 = configTab:createGroup(0)
+local serverGroup = configTab:createGroup(1)
+
+
+configGroup:addColorpicker({text = "Menu Accent",flag = "menu_accent",ontop = true,color = Color3.new(0.4,0.4,0.4),callback = function(val)
     for i,v in next, tabholder:GetDescendants() do
         pcall(function()
             if v.Name ~= "dontchange" and v.BackgroundColor3 == library.libColor then
@@ -581,14 +554,46 @@ configGroup:addColorpicker({text = "Menu Accent",flag = "menu_accent",ontop = tr
         end)
     end
     library.libColor = val
+    aloraWatermark.Color = val
 end})
+
 configGroup:addList({text = "Config",flag = "selected_config",skipflag = true,values = {}})
-configGroup:addTextbox({text = "config name",flag = "config_name"})
-configGroup:addButton({text = "Save Config",callback = library.saveConfig})
 configGroup:addButton({text = "Load Config",callback = library.loadConfig})
-configGroup:addButton({text = "Delete Config",callback = library.deleteConfig})
-configGroup:addButton({text = "Refresh Configs",callback = library.refreshConfigs})
+
+configGroup1:addTextbox({text = "config name",flag = "config_name"})
+configGroup1:addButton({text = "Save Config",callback = library.saveConfig})
+configGroup1:addButton({text = "Delete Config",callback = library.deleteConfig})
+configGroup1:addButton({text = "Refresh Configs",callback = library.refreshConfigs})
+
 library:refreshConfigs()
+
+
+serverGroup:addButton({text = "Delete Graphics",callback = function()
+	workspace:FindFirstChildOfClass('Terrain').WaterWaveSize = 0
+	workspace:FindFirstChildOfClass('Terrain').WaterWaveSpeed = 0
+	workspace:FindFirstChildOfClass('Terrain').WaterReflectance = 0
+	workspace:FindFirstChildOfClass('Terrain').WaterTransparency = 0
+	game:GetService("Lighting").GlobalShadows = false
+	game:GetService("Lighting").FogEnd = 5e3
+	for i,v in pairs(game:GetDescendants()) do
+		if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+			v.Material = "Plastic"
+		elseif v:IsA("Decal") then
+			v.Transparency = 1
+		elseif v:IsA("Explosion") then
+			v.BlastPressure = 1
+			v.BlastRadius = 1
+		end
+	end
+	for i,v in pairs(game:GetService("Lighting"):GetDescendants()) do
+		if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
+			v.Enabled = false
+		end
+	end
+end})
+serverGroup:addButton({text = "Rejoin Server", callback = function()
+    teleportService:Teleport(game.PlaceId, localPlayer)
+end})
 
 local aimbotGroup = aimbotTab:createGroup(0)
 local rifleGroup,rifleFrame = aimbotTab:createGroup(1)
@@ -656,6 +661,7 @@ otherGroup:addList({text = "Hitboxes",flag = "other_hitboxes",multiselect = true
 aimbotGroup:addToggle({text = "Enabled",flag = "aimbot_enabled"})
 aimbotGroup:addToggle({text = "Teammates",flag = "aimbot_team"})
 aimbotGroup:addToggle({text = "Visible Only",flag = "aimbot_visonly"})
+aimbotGroup:addSlider({text = "Silent aim Hit chance",flag = "hitchance",min = 0,max = 100,value = 50})
 aimbotGroup:addToggle({text = "Auto Pistol",flag = "auto_pistol",callback = function(val)
     for i,v in next, replicatedStorage.Weapons:GetChildren() do
         if v:FindFirstChild("Secondary") and v.Name ~= "CZ" then
@@ -672,224 +678,194 @@ aimbotGroup:addList({text = "Weapon",skipflag = true,flag = "aimbot_weapon",valu
     scoutFrame.Visible = val == "Scout"
     otherFrame.Visible = val == "Other"
 end})
-aimbotGroup:addDivider()
-aimbotGroup:addToggle({text = "Kill all",flag = "KillAll", callback = function(val)
-    if val == true then
-        KillAllLoop = game:GetService("RunService").RenderStepped:Connect(function()
-            wait()
-            pcall(function()
-                for i,v in pairs(game.Players:GetChildren()) do
-                    if v ~= localPlayer and isAlive(v) and isAlive(localPlayer) then
-                        local Arguments = {
-                            [1] = v.Character.Head,
-                            [2] = v.Character.Head.Position,
-                            [3] = "Banana",
-                            [4] = 100,
-                            [5] = localPlayer.Character.Gun,
-                            [8] = 100,
-                            [9] = false,
-                            [10] = false,
-                            [11] = Vector3.new(),
-                            [12] = 100,
-                            [13] = Vector3.new()
-                        }
-                        game.ReplicatedStorage.Events.HitPart:FireServer(unpack(Arguments))
-                    end
-                end
-            end)
-        end)
-    elseif val == false and KillAllLoop then
-        KillAllLoop:Disconnect()
-    end
-end})
 
-local espGroup,espFrame = visualsTab:createGroup(0)
-local ChamsGroup,ChamsFrame = visualsTab:createGroup(0)
-local worldGroup2,worldFrame2 = visualsTab:createGroup(0)
-local drawingGroup,drawingFrame = visualsTab:createGroup(1)
-local worldSettings,worldSettingsFrame = visualsTab:createGroup(1)
-local worldSettings2,worldSettingsFrame2 = visualsTab:createGroup(1)
+local mainGroup,mainFrame = visualsTab:createGroup(0)
+local TrailGroup,TrailFrame = visualsTab:createGroup(0)
+local viewmodelGroup,viewmodelFrame = visualsTab:createGroup(1)
+local other,otherFrame = visualsTab:createGroup(1)
+
+local config,configFrame = visualsTab:createGroup(0)
+local config1,configFrame1 = visualsTab:createGroup(1)
+
 local toggleTab,toggleFrame = visualsTab:createGroup(0)
 
-local visualsTabToggle = true
-toggleTab:addButton({text = "Toggle Tabs/Change Color",callback = function()
-    visualsTabToggle = not visualsTabToggle
-    espFrame.Visible = visualsTabToggle
-    drawingFrame.Visible = visualsTabToggle
-    worldSettingsFrame.Visible = visualsTabToggle
-    ChamsFrame.Visible = visualsTabToggle
+mainGroup:addToggle({text = "ESP Enabled",flag = "esp_enabled",callback = function() for i,v in next, espObjects do v.invis() end end})
+mainGroup:addToggle({text = "Box ESP",flag = "box_enabled"})
+mainGroup:addToggle({text = "Name ESP",flag = "name_enabled"})
+mainGroup:addToggle({text = "Health Bar",flag = "healthbar_enabled"})
 
-    worldFrame2.Visible = not visualsTabToggle
-    worldSettingsFrame2.Visible = not visualsTabToggle
-end})
+local trail 
+local attachment0
+local attachment1
+local TrailPosOrginal
+local TrailSizeNew
+local Debounce = false
+runService.RenderStepped:Connect(function()
+    local LocalCharacter = localPlayer.Character
+    if Debounce == false and library.flags["TrailEnabled"] and isAlive(localPlayer) then 
+        Debounce = true
+        attachment0 = Instance.new("Attachment")
+        attachment0.Name = "Attachment0"
+        attachment0.Parent = LocalCharacter.UpperTorso
+        attachment0.Position = Vector3.new(0,0,0)
+     
+        attachment1 = Instance.new("Attachment")
+        attachment1.Name = "Attachment1"
+        attachment1.Parent = LocalCharacter.LowerTorso
+        attachment1.Position = Vector3.new(0,library.flags["TrailSize"] / 10,0)
+        
+        trail = Instance.new("Trail")
+        trail.Name = "TRAILSHIT"
+        trail.Parent = LocalCharacter
+        trail.Attachment0 = attachment0
+        trail.Attachment1 = attachment1
+    end
+    attachment1.Position = Vector3.new(0,library.flags["TrailSize"] / 10,0)
+    trail.Color = ColorSequence.new(library.flags["trailcolor"],library.flags["trailcolor"])
+    trail.Lifetime = library.flags["TrailLength"]
+    if isAlive(localPlayer) == false or library.flags["TrailEnabled"] == false then 
+        Debounce = false
+        trail:Destroy()
+    end
+end)
 
-espGroup:addToggle({text = "ESP Enabled",flag = "esp_enabled",callback = function() for i,v in next, espObjects do v.invis() end end})
-espGroup:addToggle({text = "Box ESP",flag = "box_enabled"})
-espGroup:addToggle({text = "Name ESP",flag = "name_enabled"})
-espGroup:addToggle({text = "Health Bar",flag = "healthbar_enabled"})
+TrailGroup:addToggle({text = "Player Trail",flag = "TrailEnabled"})
+TrailGroup:addSlider({text = 'Length',flag = "TrailLength",value = 100,min = 0, max = 100})
+TrailGroup:addSlider({text = 'Size',flag = "TrailSize",value = 0,min = 0, max = 10})
+TrailGroup:addColorpicker({text = "Color",ontop = true,flag = "trailcolor",color = Color3.new(255,255,255)})
 
-local function DeleteChams()
-    wait(0.5)
-    for _, v in next, localPlayer.PlayerGui:GetChildren() do
-         if v:IsA('Folder') and ( game:GetService('Players'):FindFirstChild(v.Name) or v:FindFirstChildOfClass('BoxHandleAdornment') ) then
-            v:Destroy()
+local color = Color3.new(1,1,1)
+local color2 = Color3.new(0,0,0)
+local outlineTransparency = 0
+local innerTransparency = 1
+local depthMode = 'AlwaysOnTop'
+
+mainGroup:addToggle({text = 'Glow',flag = 'highlights', function()
+    for _, player in pairs(players:GetPlayers()) do
+        if player.Team ~= localPlayer.Team and player.Status.Alive.Value == true and player.Character:FindFirstChild('Highlight') then
+            player.Character:FindFirstChild('Highlight').OutlineColor = color
+            player.Character:FindFirstChild('Highlight').OutlineTransparency = outlineTransparency
+            player.Character:FindFirstChild('Highlight').FillTransparency = innerTransparency
+            player.Character:FindFirstChild('Highlight').FillColor = color
+            player.Character:FindFirstChild('Highlight').DepthMode = depthMode
         end
     end
 end
+})
 
-ChamsGroup:addToggle({text = "Enable Chams",flag = "ChamsEnabled",callback = DeleteChams()})
-ChamsGroup:addToggle({text = "Enemy Chams",flag = "ChamsEnemy", callback = DeleteChams()})
-ChamsGroup:addToggle({text = "Enemy Chams Hidden",flag = "ChamsEnemyHidden", callback = DeleteChams()}) --dont becuase this is set to a loop anyways,
-ChamsGroup:addToggle({text = "Tean Chams",flag = "ChamsTeam", callback = DeleteChams()})
-ChamsGroup:addToggle({text = "Tean Chams Hidden",flag = "ChamsTeamHidden", callback = DeleteChams()})
-ChamsGroup:addToggle({text = "Weapon Chams",flag = "weapon_chams",callback = updateViewmodel})
-ChamsGroup:addToggle({text = "Arm Chams",flag = "arm_chams",callback = updateViewmodel})
-ChamsGroup:addToggle({text = "Remove Sleeves",flag = "remove_sleeves",callback = updateViewmodel})
-ChamsGroup:addDivider()
-ChamsGroup:addToggle({text = "ThirdPerson", flag = "ThirdPersonEnabled"})
-ChamsGroup:addSlider({text = "DIstance",flag = "TPDistance",value = 10,min = 1,max = 25})
-local ThirdPersonCheck = false
-ChamsGroup:addKeybind({text = "Thirdperson Bind",flag = "Thirdperson Bind",key = Enum.KeyCode.V, callback = function()
-    if library.flags["ThirdPersonEnabled"] == true then 
-        if ThirdPersonCheck == true then 
-            ThirdPersonCheck = false
-        else
-            ThirdPersonCheck = true
+mainGroup:addDivider()
+mainGroup:addToggle({text = "Skybox Changer",flag = "skybox_changer",callback = updateSkybox})
+mainGroup:addToggle({text = "World Gradient",flag = "world_gradient"})
+mainGroup:addToggle({text = "Time Changer",flag = "time_changer",callback = function() lighting.TimeOfDay = 15 end})
+mainGroup:addDivider()
+mainGroup:addToggle({text = "Hitmarkers",flag = "hitmarkers"})
+mainGroup:addToggle({text = "Bullet Tracers",flag = "bullet_tracer"})
+mainGroup:addToggle({text = "Bullet Impacts",flag = "bullet_imp"})
+
+viewmodelGroup:addToggle({text = "Viewmodel Changer",flag = "viewmodel_changer"})
+viewmodelGroup:addToggle({text = "Weapon Chams",flag = "weapon_chams"})
+viewmodelGroup:addToggle({text = "Remove Arms",flag = "remove_arms"})
+viewmodelGroup:addToggle({text = "Remove Gloves",flag = "remove_gloves"})
+viewmodelGroup:addToggle({text = "Remove Sleeves",flag = "remove_sleeves"})
+viewmodelGroup:addToggle({text = "Force Crosshair",flag = "force_cross"})
+
+other:addColorpicker({text = "Glow Fill Color",ontop = true,flag = "glow_color",color = Color3.new(1, 0.7, 1),callback = function(value)
+    color = value
+    for _, player in pairs(players:GetPlayers()) do
+        if player.Team ~= localPlayer.Team and player.Status.Alive.Value == true and player.Character:FindFirstChild('Highlight') then
+            player.Character:FindFirstChild('Highlight').FillColor = color
         end
-    else
-        ThirdPersonCheck = false
+    end
+end})
+
+other:addColorpicker({text = "Glow Outline Color",ontop = true,flag = "glow_color",color = Color3.new(1, 0.3, 1),callback = function(value)
+    color2 = value
+    for _, player in pairs(players:GetPlayers()) do
+        if player.Team ~= localPlayer.Team and player.Status.Alive.Value == true and player.Character:FindFirstChild('Highlight') then
+            player.Character:FindFirstChild('Highlight').OutlineColor = color2
+        end
+    end
+end})
+other:addList({text = "Glow Type",flag = "glow_mode",values = {'AlwaysOnTop','Occluded'},callback = function(value)
+    depthMode = value
+    for _, player in pairs(players:GetPlayers()) do
+        if player.Team ~= localPlayer.Team and player.Status.Alive.Value == true and player.Character:FindFirstChild('Highlight') then
+            player.Character:FindFirstChild('Highlight').DepthMode = depthMode
+        end
+    end
+end})
+other:addSlider({text = 'Outline Glow Transparency',flag = "glow_outtrans",value = 100,min = 0, max = 100,callback = function(value)
+    outlineTransparency = value / 100
+    for _, player in pairs(players:GetPlayers()) do
+        if player.Team ~= localPlayer.Team and player.Status.Alive.Value == true and player.Character:FindFirstChild('Highlight') then
+            player.Character:FindFirstChild('Highlight').OutlineTransparency = outlineTransparency
+        end
+    end
+end})
+other:addSlider({text = 'Inner Transparency',flag = "glow_intrans",value = 100,min = 0, max = 100,callback = function(value)
+    innerTransparency = value / 100
+    for _, player in pairs(players:GetPlayers()) do
+        if player.Team ~= localPlayer.Team and player.Status.Alive.Value == true and player.Character:FindFirstChild('Highlight') then
+            player.Character:FindFirstChild('Highlight').FillTransparency = innerTransparency
+        end
     end
 end})
 
 
-worldSettings:addToggle({text = "Bullet Tracers",flag = "bullet_tracer"})
-worldSettings:addToggle({text = "World Gradient",flag = "world_gradient"})
-worldSettings:addToggle({text = "Time Changer",flag = "time_changer",callback = function()
-    wait()
-    lighting.TimeOfDay = 15
+config:addColorpicker({text = "Box Color",ontop = true,flag = "box_color",color = Color3.new(0.4,0.4,0.4)})
+config:addColorpicker({text = "Name Color",ontop = true,flag = "name_color",color = Color3.new(0.4,0.4,0.4)})
+config:addColorpicker({text = "Health Bar Color",ontop = true,flag = "healthbar_color",color = Color3.new(0.4,0.4,0.4)})
+config:addDivider()
+config:addColorpicker({text = "Hitmarker Color",ontop = true,flag = "hmcolor",color = Color3.new(1,1,1)})
+config:addColorpicker({text = "Tracer Color",ontop = true,flag = "tracer_color",color = Color3.new(0.4,0.4,0.4)})
+config:addColorpicker({text = "Impact Color",ontop = true,flag = "bullet_impcol",color = Color3.new(0.4,0.4,0.4)})
+config:addDivider()
+config:addColorpicker({text = "World Gradient Color",ontop = true,flag = "gradient_color",color = Color3.new(0.4,0.4,0.4)})
+config:addColorpicker({text = "Outdoor Gradient Color",ontop = true,flag = "outdoor_gradient_color",color = Color3.new(0.4,0.4,0.4)})
+config:addColorpicker({text = "Weapon Chams Color",ontop = true,flag = "weapon_color",color = Color3.new(0.4,0.4,0.4)})
+config:addList({text = "Material",flag = "weapon_material", multiselect = false, values = {"SmoothPlastic", "Neon", "ForceField", "Wood", "Glass"}})
+config:addList({text = "Skybox",flag = "selected_skybox",callback = updateSkybox,values = {"Purple Nebula","Night Sky","Pink Daylight","Morning Glow","Setting Sun","Elegant Morning","Elegant Morning","Neptune","Redshift","Aesthetic Night"}})
+
+
+config1:addSlider({text = "Viewmodel X",flag = "viewmodel_x",value = 20,min = 0,max = 40})
+config1:addSlider({text = "Viewmodel Y",flag = "viewmodel_y",value = 20,min = 0,max = 40})
+config1:addSlider({text = "Viewmodel Z",flag = "viewmodel_z",value = 20,min = 0-40,max = 40})
+config1:addSlider({text = "Time",flag = "time_value",value = 24,min = 0,max = 48})
+config1:addSlider({text = "Weapon Transparency",flag = "weap_trans",value = 0,min = 0,max = 10})
+config1:addSlider({text = "Weapon Reflectance",flag = "weap_refl",value = 0,min = 0,max = 10})
+
+local visualsTabToggle = true
+toggleTab:addButton({text = "Toggle Tabs",callback = function()
+    visualsTabToggle = not visualsTabToggle
+    TrailFrame = visualsTabToggle
+    mainFrame.Visible = visualsTabToggle
+    viewmodelFrame.Visible  = visualsTabToggle
+    otherFrame.Visible  = visualsTabToggle
+    configFrame.Visible = not visualsTabToggle
+    configFrame1.Visible = not visualsTabToggle
 end})
-worldSettings:addToggle({text = "Skybox Changer",flag = "skybox_changer",callback = updateSkybox})
-worldSettings:addToggle({text = "Remove Flash",flag = "remove_flash",callback = function(v)
-    localPlayer.PlayerGui.Blnd.Blind.Visible = not v
-end})
-worldSettings:addToggle({text = "Remove Radio",flag = "remove_radio"})
-worldSettings:addToggle({text = "Viewmodel Changer",flag = "viewmodel_changer"})
 
-worldGroup2:addColorpicker({text = "Box Color",ontop = true,flag = "box_color",color = Color3.new(1,1,1)})
-worldGroup2:addColorpicker({text = "Name Color",ontop = true,flag = "name_color",color = Color3.new(1,1,1)})
-worldGroup2:addColorpicker({text = "Health Bar Color",ontop = true,flag = "healthbar_color",color = Color3.new(0.2,0.75,0.2)})
-worldGroup2:addDivider()
-worldGroup2:addColorpicker({text = "Enemy Chams Color",ontop = true,flag = "EnemyColor",color = Color3.new(0.25,0.15,0.6)})
-worldGroup2:addColorpicker({text = "Enemy Chams Color hidden",ontop = true,flag = "EnemyColorHidden",color = Color3.new(1, 0, 0.501960)})
-worldGroup2:addColorpicker({text = "Team Chams Color",ontop = true,flag = "TeamColor",color = Color3.new(0.25,0.15,0.6)})
-worldGroup2:addColorpicker({text = "Team Chams Color hidden",ontop = true,flag = "TeamColorHidden",color = Color3.new(1, 0, 0.501960)})
-worldGroup2:addDivider()
-worldGroup2:addColorpicker({text = "Weapon Chams Color",ontop = true,callback = updateViewmodel,flag = "weapon_color",color = Color3.new(0.25,0.15,0.6)})
-worldGroup2:addColorpicker({text = "Arm Chams Color",ontop = true,callback = updateViewmodel,flag = "arm_color",color = Color3.new(0.15,0.05,0.55)})
-worldGroup2:addDivider()
-worldGroup2:addColorpicker({text = "Tracer Color",ontop = true,flag = "tracer_color",color = Color3.new(0.35,0.35,1)})
-worldGroup2:addColorpicker({text = "Gradient Color",ontop = true,flag = "gradient_color",color = Color3.new(0.4,0.4,0.8)})
-worldGroup2:addColorpicker({text = "Outdoor Gradient Color",ontop = true,flag = "outdoor_gradient_color",color = Color3.new(0.25,0.25,0.65)})
-worldGroup2:addList({text = "Skybox",flag = "selected_skybox",callback = updateSkybox,values = {"Purple Nebula","Night Sky","Pink Daylight","Morning Glow","Setting Sun","Elegant Morning","Elegant Morning","Neptune","Redshift","Aesthetic Night"}})
 
-worldSettings2:addSlider({text = "Viewmodel X",flag = "viewmodel_x",value = 20,min = 0,max = 40})
-worldSettings2:addSlider({text = "Viewmodel Y",flag = "viewmodel_y",value = 20,min = 0,max = 40})
-worldSettings2:addSlider({text = "Viewmodel Z",flag = "viewmodel_z",value = 20,min = 0,max = 40})
-worldSettings2:addDivider()
-worldSettings2:addSlider({text = "Enemy Chams Transparency",flag = "EnemyTrans",value = 50,min = 0,max = 100})
-worldSettings2:addSlider({text = "Hidden Enemy Chams Transparency ",flag = "HiddenEnemyTrans",value = 50,min = 0,max = 100})
-worldSettings2:addSlider({text = "Team Chams Transparency ",flag = "TeamTrans",value = 50,min = 0,max = 100})
-worldSettings2:addSlider({text = "Hidden Team Chams Transparency ",flag = "HiddenTeamTrans",value = 50,min = 0,max = 100})
-worldSettings2:addDivider()
-worldSettings2:addSlider({text = "Weapon Chams Transparency",flag = "weapon_trans",callback = updateViewmodel,value = 50,min = 0,max = 100,callback = updateSkybox})
-worldSettings2:addSlider({text = "Arm Chams Transparency",flag = "arm_trans",callback = updateViewmodel,value = 50,min = 0,max = 100,callback = updateSkybox})
-worldSettings2:addDivider()
-worldSettings2:addSlider({text = "Time",flag = "time_value",value = 24,min = 0,max = 48})
+configFrame.Visible = false
+configFrame1.Visible = false
 
-worldFrame2.Visible = false
-worldSettingsFrame2.Visible = false
+local movementGroup,movementFrame = miscTab:createGroup(0)
+local waypointGroup,waypointFrame = miscTab:createGroup(0)
+local misc,miscFrame = miscTab:createGroup(0)
+local misc2,miscFrame2 = miscTab:createGroup(1)
+local RecordingsGroup,RecFrame1 = miscTab:createGroup(1)
+local RecorderGroup,RecFrame2 = miscTab:createGroup(1) 
 
-local lines = {}
-local lastPos = camera.ViewportSize.Y-90
-local veloIndicator = Drawing.new("Text");veloIndicator.Center = true;veloIndicator.Outline = true;veloIndicator.Color = Color3.new(1,1,1);veloIndicator.Font = 2;veloIndicator.Size = 13;veloIndicator.Visible = false;veloIndicator.Text = "0"
-local wIndicator = Drawing.new("Text");wIndicator.Center = true;wIndicator.Outline = true;wIndicator.Color = Color3.new(1,1,1);wIndicator.Font = 2;wIndicator.Size = 13;wIndicator.Visible = false;wIndicator.Text = "-"
-local aIndicator = Drawing.new("Text");aIndicator.Center = true;aIndicator.Outline = true;aIndicator.Color = Color3.new(1,1,1);aIndicator.Font = 2;aIndicator.Size = 13;aIndicator.Visible = false;aIndicator.Text = "-"
-local sIndicator = Drawing.new("Text");sIndicator.Center = true;sIndicator.Outline = true;sIndicator.Color = Color3.new(1,1,1);sIndicator.Font = 2;sIndicator.Size = 13;sIndicator.Visible = false;wIndicator.Text = "-"
-local dIndicator = Drawing.new("Text");dIndicator.Center = true;dIndicator.Outline = true;dIndicator.Color = Color3.new(1,1,1);dIndicator.Font = 2;dIndicator.Size = 13;dIndicator.Visible = false;dIndicator.Text = "-"
-local spaceIndicator = Drawing.new("Text");spaceIndicator.Center = true;spaceIndicator.Outline = true;spaceIndicator.Color = Color3.new(1,1,1);spaceIndicator.Font = 2;spaceIndicator.Size = 13;spaceIndicator.Visible = false;spaceIndicator.Text = "-"
-local ctrlIndicator = Drawing.new("Text");ctrlIndicator.Center = true;ctrlIndicator.Outline = true;ctrlIndicator.Color = Color3.new(1,1,1);ctrlIndicator.Font = 2;ctrlIndicator.Size = 13;ctrlIndicator.Visible = false;ctrlIndicator.Text = "-"
-
-drawingGroup:addToggle({text = "Drawing Enabled",flag = "drawing_enabled",callback = function()
-    while library.flags["drawing_enabled"] do wait()
-        local normalY = camera.ViewportSize.Y-90
-        local alive = isAlive()
-        local value = alive and math.floor(math.clamp((localPlayer.Character.HumanoidRootPart.Velocity * Vector3.new(1,0,1)).magnitude*14.85,0,400)) or 0
-        if library.flags["velo_graph"] then
-            local width = library.flags["graph_width"]+1
-            local line = Drawing.new("Line")
-            table.insert(lines,line)
-            line.From = Vector2.new(camera.ViewportSize.X/2 + (60*width - width),lastPos)
-            line.To = Vector2.new(camera.ViewportSize.X/2 + 60*width,normalY - value/4)
-            line.Thickness = 1
-            line.Transparency = 1
-            line.Color = Color3.new(1,1,1)
-            line.Visible = true
-            if #lines > 1 then
-                if #lines > 110 then
-                    lines[1]:Remove()
-                    table.remove(lines,1)
-                    for i = 2,8 do
-                        lines[i].Transparency = i/10
-                    end
-                    local count = 0
-                    for i=110,110-6,-1 do
-                        count = count + 1
-                        lines[i].Transparency = count/10
-                    end
-                    lines[110-7].Transparency = 1
-                end
-                for i,v in ipairs(lines) do
-                    v.To = v.To - Vector2.new(width,0)
-                    v.From = v.From - Vector2.new(width,0)
-                end
-            end
-            lastPos = line.To.Y
-        end
-        if library.flags["velo_indicator"] then
-            veloIndicator.Text = tostring(value)
-            veloIndicator.Position = Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y-75)
-        end
-        if library.flags["wasd_indicator"] then
-            wIndicator.Position = Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y-50)
-            aIndicator.Position = Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y-50) + Vector2.new(-40,25)
-            sIndicator.Position = Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y-50) + Vector2.new(0,25)
-            dIndicator.Position = Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y-50) + Vector2.new(40,25)
-            spaceIndicator.Position = Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y-50) + Vector2.new(40,0)
-            ctrlIndicator.Position = Vector2.new(camera.ViewportSize.X/2,camera.ViewportSize.Y-50) + Vector2.new(-40,0)
-
-            wIndicator.Text = userInputService:IsKeyDown(Enum.KeyCode.W) and "W" or "-"
-            aIndicator.Text = userInputService:IsKeyDown(Enum.KeyCode.A) and "A" or "-"
-            sIndicator.Text = userInputService:IsKeyDown(Enum.KeyCode.S) and "S" or "-"
-            dIndicator.Text = userInputService:IsKeyDown(Enum.KeyCode.D) and "D" or "-"
-            spaceIndicator.Text = userInputService:IsKeyDown(Enum.KeyCode.Space) and "J" or "-"
-            ctrlIndicator.Text = userInputService:IsKeyDown(Enum.KeyCode.LeftControl) and "C" or "-"
-        end
-    end
-end})
-drawingGroup:addToggle({text = "Velocity Graph",flag = "velo_graph"})
-drawingGroup:addToggle({text = "Velocity Indicator",flag = "velo_indicator"})
-drawingGroup:addToggle({text = "WASD Indicator",flag = "wasd_indicator"})
-drawingGroup:addSlider({text = "Graph Width",flag = "graph_width",min = 1,max = 5,value = 1})
-
-local movementGroup = miscTab:createGroup(0)
-local otherGroup = miscTab:createGroup(0)
-local otherGroup2 = miscTab:createGroup(1)
+local toggleTab,toggleFrame = miscTab:createGroup(0)
 
 movementGroup:addToggle({text = "Bunny Hop",flag = "bunny_hop",callback = function()
     while library.flags["bunny_hop"] do runService.RenderStepped:Wait()--wait()
         if isAlive() and userInputService:IsKeyDown(Enum.KeyCode.Space) then
             localPlayer.Character.Humanoid.Jump = true
             local speed = library.flags["bhop_speed"]
+            if  isButtonDown(library.flags["boostbind"]) then
+                speed = library.flags["bhop_speed"] + library.flags["bhopboost"]
+            end
             local dir = camera.CFrame.LookVector * Vector3.new(1,0,1)
             local move = Vector3.new()
             move = userInputService:IsKeyDown(Enum.KeyCode.W) and move + dir or move
@@ -903,77 +879,1551 @@ movementGroup:addToggle({text = "Bunny Hop",flag = "bunny_hop",callback = functi
         end
     end
 end})
-movementGroup:addToggle({text = "Jumpbug",flag = "jump_bug"})
-movementGroup:addToggle({text = "Edgebug",flag = "edge_bug"})
-movementGroup:addKeybind({text = "EB Bind",flag = "eb_bind",key = Enum.KeyCode.E})
-movementGroup:addKeybind({text = "JB Bind",flag = "jb_bind",key = Enum.UserInputType.MouseButton3})
-movementGroup:addSlider({text = "Speed",flag = "bhop_speed",min = 1,max = 50,value = 15})
-
-otherGroup:addToggle({text = "Prevent Fall Damage",flag = "fall_damage"})
-otherGroup:addToggle({text = "Prevent Fire Damage",flag = "fire_damage"})
-otherGroup:addToggle({text = "Remove Recoil",flag = "remove_recoil"})
-otherGroup:addToggle({text = "Anti Spectator", flag = "AntiSpec"})
-otherGroup:addToggle({text = "Infinite Cash",flag = "inf_cash",callback = function()
-    if not library.flags["inf_cash"] then
-        wait()
-        localPlayer.Cash.Value = 1000
-    end
-end})
-otherGroup:addToggle({text = "Spectator List",flag = "spec_list",callback = function(val)
-    speclistText.Visible = val
-end})
-
-otherGroup2:addToggle({text = "Backtrack",flag = "backtrack_enabled"})
-otherGroup2:addToggle({text = "Hitsound",flag = "hitsound_enabled"})
-otherGroup2:addToggle({text = "Watermark",flag = "watermark_enabled",callback = function(val)
-    aloraWatermark.Visible = val
-end})
-otherGroup2:addToggle({text = "Splatoon Sound Effects",flag = "splatoon_sounds",callback = function(val)-- ;)
-    for i,v in next, localPlayer.PlayerGui.Music:GetDescendants() do
-		if v:IsA("Sound") then
-			if v.Name == "Lose" then
-				v.SoundId = val and "rbxassetid://5566798757" or oldSounds["Lose"]
-			elseif v.Name == "Win" then
-				v.SoundId = val and "rbxassetid://5566793224" or oldSounds["Win"]
-			elseif v.Name == "Bomb" then
-				v.SoundId = val and "rbxassetid://444115590" or oldSounds["Bomb"]
-			elseif v.Name == "1" then
-				if v.Parent.Name == "StartRound" then
-					v.SoundId = val and "rbxassetid://5566732319" or oldSounds["StartRound"]
-				else
-					v.SoundId = "rbxassetid://"
-				end
+movementGroup:addToggle({text = "Fast Crouch", callback = function(val)
+	if val == true then
+		runService:BindToRenderStep("Stamina", 100, function()
+			if client.crouchcooldown ~= 0 then
+				client.crouchcooldown = 0.4
 			end
-		end
+		end)
+	elseif val == false then
+		runService:UnbindFromRenderStep("Stamina")
 	end
 end})
-otherGroup2:addList({text = "Hit Sound",flag = "hitsound_value",values = {"Bameware","Bell","Bubble","Pick","Pop","Rust","Skeet","Neverlose","Minecraft"}})
-otherGroup2:addButton({text = "Crash Server",callback = function()
-    if not isAlive() then
-        library:notify("Waiting until you respawn...")
-        repeat wait(1) until isAlive()
+movementGroup:addSlider({text = "Speed",flag = "bhop_speed",min = 1,max = 50,value = 15})
+movementGroup:addToggle({text = "Edgebug",flag = "edge_bug"})
+movementGroup:addKeybind({text = "EB Bind",flag = "eb_bind",key = Enum.KeyCode.E})
+movementGroup:addKeybind({text = "Bhop Boost",flag = "boostbind",key = Enum.KeyCode.X})
+movementGroup:addSlider({text = "Boost",flag = "bhopboost",min = 1,max = 50,value = 15})
+movementGroup:addToggle({text = "Edgebug Sound",flag = "EbSoundToggle"})
+movementGroup:addList({text = "Sound",flag = "EBsoundValue",values = {"Rust","Skeet","Neverlose","Minecraft","jewelxx","hexx","krxxxk","slots","sonic"}})
+movementGroup:addSlider({text = "Volume",flag = "EBSoundVolume",value = 2,min = 1,max = 10})
+
+rayIgnore.ChildAdded:Connect(function(obj)
+    if obj.Name == "Smokes" then
+        obj.ChildAdded:Connect(function(smoke)
+			runService.RenderStepped:Wait()
+			local OriginalRate = Instance.new("NumberValue")
+			OriginalRate.Value = smoke.ParticleEmitter.Rate
+			OriginalRate.Name = "OriginalRate"
+			OriginalRate.Parent = smoke
+			if library.flags["remove_smoke"] then
+				smoke.ParticleEmitter.Rate = 1
+			end
+            smoke.Material = Enum.Material.ForceField
+			if library.flag["smoke_radius"] then
+				smoke.Transparency = 0
+                smoke.Color = library.flags["smoker_color"]
+			end
+        end)
     end
-    library:notify("Crashing server...")
-    while runService.RenderStepped:Wait() do
-        for i=1,20 do
+end)
+
+if rayIgnore:FindFirstChild("Smokes") then
+	for _,smoke in pairs(rayIgnore:FindFirstChild("Smokes"):GetChildren()) do
+		local OriginalRate = Instance.new("NumberValue")
+		OriginalRate.Value = smoke.ParticleEmitter.Rate
+		OriginalRate.Name = "OriginalRate"
+		OriginalRate.Parent = smoke
+		smoke.Material = Enum.Material.ForceField
+	end
+    rayIgnore:FindFirstChild("Smokes").ChildAdded:Connect(function(smoke)
+		runService.RenderStepped:Wait()
+		local OriginalRate = Instance.new("NumberValue")
+		OriginalRate.Value = smoke.ParticleEmitter.Rate
+		OriginalRate.Name = "OriginalRate"
+		OriginalRate.Parent = smoke
+		if library.flags["remove_smoke"] then
+			smoke.ParticleEmitter.Rate = 0.5
+		end
+        smoke.Material = Enum.Material.ForceField
+		if library.flags["smoke_radius"] then
+			smoke.Transparency = 0.2
+			smoke.Color = library.flags["smoker_color"]
+		end
+    end)
+end
+
+local oldBloodSplatter = client.splatterBlood;
+local newBloodSplatter = function() end;
+misc:addToggle({text = "No Recoil",flag = "remove_recoil"})
+misc:addToggle({text = "Remove Flash",flag = "remove_flash",callback = function(v) localPlayer.PlayerGui.Blnd.Blind.Visible = not v end})
+misc:addToggle({text = 'Remove Blood', flag = 'Enabled', callback = function(bool) client.splatterBlood = bool and newBloodSplatter or oldBloodSplatter; end})
+misc:addToggle({text = "Remove Bullets",flag = "no_bullet"})
+misc:addToggle({text = "Remove Smoke",flag = "remove_smoke"})
+misc:addToggle({text = "Smoke Radius",flag = "smoke_radius"})
+misc:addColorpicker({text = "Smoke Radius Color",ontop = true,flag = "smoker_color",color = Color3.new(0.4,0.4,0.4)})
+
+misc2:addToggle({text = "Backtrack",flag = "backtrack_enabled"})
+misc2:addToggle({text = "Hitsound",flag = "hitsound_enabled"})
+misc2:addToggle({text = "Old Gun Sounds", callback = function(val)
+    if val == true then
+        OldGunSounds = game:GetService("RunService").RenderStepped:Connect(function()
             pcall(function()
-                replicatedStorage.Events.DropMag:FireServer(localPlayer.Character.Gun.Mag)
-            end)
+                    local player = game:GetService("Players").LocalPlayer.Character
+                    if player.EquippedTool.Value == "AK47" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://168436671"
+                        player.Gun.bolt.SoundId = "rbxassetid://1684275289"
+                        player.Gun.boltin.SoundId = "rbxassetid://3599995642"
+                        player.Gun.boltrelease.SoundId = "rbxassetid://515216512"
+                        player.Gun.magin.SoundId = "rbxassetid://1684275593"
+                        player.Gun.magout.SoundId = "rbxassetid://1684275849"
+                    end
+                    if player.EquippedTool.Value == "M4A1" then
+                        player.Gun.SShoot.SoundId = "rbxassetid://1665639883"
+                        player.Gun.Equip.SoundId = "rbxassetid://6564247176"
+                        player.Gun.Remove.SoundId = "rbxassetid://1665639103"
+                        player.Gun.Shoot.SoundId = "rbxassetid://223013951"
+                        player.Gun.Apply.SoundId = "rbxassetid://1665639351"
+                        player.Gun.Turn1.SoundId = "rbxassetid://925145888"
+                        player.Gun.Turn2.SoundId = "rbxassetid://925145967"
+                        player.Gun.Turn3.SoundId = "rbxassetid://925146060"
+                        player.Gun.Turn4.SoundId = "rbxassetid://925146170"
+                        player.Gun.Turn5.SoundId = "rbxassetid://925146323"
+                        player.Gun.Turn6.SoundId = "rbxassetid://925146323"
+                        player.Gun.Turn7.SoundId = "rbxassetid://925146323"
+                        player.Gun.bolt.SoundId = "rbxassetid://1684291592"
+                        player.Gun.boltin.SoundId = "rbxassetid://1684291797"
+                        player.Gun.boltrelease.SoundId = "rbxassetid://1684291797"
+                        player.Gun.magin.SoundId = "rbxassetid://1684292119"
+                        player.Gun.magout.SoundId = "rbxassetid://1684292401"
+                    end
+                    if player.EquippedTool.Value == "Glock" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://1665635507"
+                        player.Gun.Switch.SoundId = "rbxassetid://240962650"
+                        player.Gun.maghit.SoundId = "rbxassetid://888771897"
+                        player.Gun.magin.SoundId = "rbxassetid://1684288365"
+                        player.Gun.magout.SoundId = "rbxassetid://1684288526"
+                        player.Gun.slide.SoundId = "rbxassetid://1684288735"
+                        player.Gun.slidein.SoundId = "rbxassetid://1684289044"
+                    end
+                    if player.EquippedTool.Value == "Galil" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://344800912"
+                        player.Gun.Equip.SoundId = "rbxassetid://1665634238"
+                        player.Gun.bolt.SoundId = "rbxassetid://1684286891"
+                        player.Gun.boltin.SoundId = "rbxassetid://1684287138"
+                        player.Gun.magin.SoundId = "rbxassetid://1684287952"
+                        player.Gun.magout.SoundId = "rbxassetid://1684288128"
+                    end
+                    if player.EquippedTool.Value == "USP" then
+                        player.Gun.SShoot.SoundId = "rbxassetid://1112952739"
+                        player.Gun.Shoot.SoundId = "rbxassetid://1665652648"
+                        player.Gun.apply.SoundId = "rbxassetid://1665639351"
+                        player.Gun.magin.SoundId = "rbxassetid://206942341"
+                        player.Gun.magout.SoundId = "rbxassetid://206942338"
+                        player.Gun.remove.SoundId = "rbxassetid://1665639103"
+                        player.Gun.slide.SoundId = "rbxassetid://223013136"
+                        player.Gun.slidein.SoundId = "rbxassetid://206942322"
+                        player.Gun.turn1.SoundId = "rbxassetid://936530480"
+                        player.Gun.turn2.SoundId = "rbxassetid://936530564"
+                        player.Gun.turn3.SoundId = "rbxassetid://936530659"
+                        player.Gun.turn4.SoundId = "rbxassetid://936530800"
+                        player.Gun.turn5.SoundId = "rbxassetid://936530926"
+                        player.Gun.turn6.SoundId = "rbxassetid://936530926"
+                        player.Gun.turn7.SoundId = "rbxassetid://936530926"
+                    end
+                    if player.EquippedTool.Value == "DualBerettas" then 
+                        player.Gun1.Shoot.SoundId = "rbxassetid://251030881"
+                        player.Gun2.Shoot.SoundId = "rbxassetid://251030881"
+                    end
+                    if player.EquippedTool.Value == "P250" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://340365431"
+                        player.Gun.Shoot.TimePosition = 0
+                        player.Gun.magin.SoundId = "rbxassetid://1684297881"
+                        player.Gun.magout.SoundId = "rbxassetid://1684298091"
+                        player.Gun.slide.SoundId = "rbxassetid://1684298337"
+                        player.Gun.slidein.SoundId = "rbxassetid://1684298585"
+                    end
+                    if player.EquippedTool.Value == "DesertEagle" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://202918645"
+                        player.Gun.Equip.SoundId = "rbxassetid://223012521"
+                        player.Gun.magin.SoundId = "rbxassetid://1684279318"
+                        player.Gun.magout.SoundId = "rbxassetid://1684279591"
+                        player.Gun.slide.SoundId = "rbxassetid://1684279824"
+                        player.Gun.slidein.SoundId = "rbxassetid://1684280102"
+                    end
+                    if player.EquippedTool.Value == "M249" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://193868290"
+                        player.Gun.bolt.SoundId = "rbxassetid://1158042711"
+                        player.Gun.boltin.SoundId = "rbxassetid://1158042903"
+                        player.Gun.boxin.SoundId = "rbxassetid://1158045048"
+                        player.Gun.boxout.SoundId = "rbxassetid://1158045203"
+                        player.Gun.bullets.SoundId = "rbxassetid://1158043093"
+                        player.Gun.close.SoundId = "rbxassetid://1158044531"
+                        player.Gun.open.SoundId = "rbxassetid://1158044816"
+                    end
+                    if player.EquippedTool.Value == "MP9" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://222888810"
+                        player.Gun.bolt.SoundId = "rbxassetid://1684295316"
+                        player.Gun.boltin.SoundId = "rbxassetid://1684295598"
+                        player.Gun.magin.SoundId = "rbxassetid://1684294512"
+                        player.Gun.magout.SoundId = "rbxassetid://1684294744"
+                    end
+                    if player.EquippedTool.Value == "UMP" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://206953341"
+                        player.Gun.bolt.SoundId = "rbxassetid://1684306766"
+                        player.Gun.boltin.SoundId = "rbxassetid://1684285841"
+                        player.Gun.magin.SoundId = "rbxassetid://1684306283"
+                        player.Gun.magout.SoundId = "rbxassetid://1684306521"
+                    end
+                    if player.EquippedTool.Value == "P90" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://1665644012"
+                        player.Gun.bolt.SoundId = "rbxassetid://1684297105"
+                        player.Gun.boltin.SoundId = "rbxassetid://1684297300"
+                        player.Gun.maghit.SoundId = "rbxassetid://1684296035"
+                        player.Gun.magin.SoundId = "rbxassetid://1684296357"
+                        player.Gun.magout.SoundId = "rbxassetid://1684296652"
+                    end
+                    if player.EquippedTool.Value == "Bizon" then
+                        player.Gun.Equip.SoundId = "rbxassetid://485606203"
+                        player.Gun.Shoot.SoundId = "rbxassetid://1544325366"
+                        player.Gun.bolt.SoundId = "rbxassetid://1183581141"
+                        player.Gun.boltin.SoundId = "rbxassetid://1544325072"
+                        player.Gun.magin.SoundId = "rbxassetid://1505933747"
+                        player.Gun.magout.SoundId = "rbxassetid://1505933951"
+                    end
+                    if player.EquippedTool.Value == "Famas" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://206953280"
+                        player.Gun.Switch.SoundId = "rbxassetid://240962650"
+                        player.Gun.bolt.SoundId = "rbxassetid://1684281554"
+                        player.Gun.boltin.SoundId = "rbxassetid://1684281882"
+                        player.Gun.maghit.SoundId = "rbxassetid://1684282232"
+                        player.Gun.magin.SoundId = "rbxassetid://1684282468"
+                        player.Gun.magout.SoundId = "rbxassetid://1684284000"
+                    end
+                    if player.EquippedTool.Value == "Scout" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://2476571739"
+                        player.Gun.bolt.SoundId = "rbxassetid://516399716"
+                        player.Gun.boltin.SoundId = "rbxassetid://516399736"
+                        player.Gun.maghit.SoundId = "rbxassetid://516399754"
+                        player.Gun.magin.SoundId = "rbxassetid://516399767"
+                        player.Gun.magout.SoundId = "rbxassetid://516399791"
+                        player.Gun.Zoom.SoundId = "rbxassetid://2862871544"
+                        player.Gun.Zoom.PlaybackSpeed = 1
+                    end
+                    if player.EquippedTool.Value == "AUG" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://1657593449"
+                        player.Gun.bolt.SoundId = "rbxassetid://1684276056"
+                        player.Gun.boltin.SoundId = "rbxassetid://1684276387"
+                        player.Gun.maghit.SoundId = "rbxassetid://1684276669"
+                        player.Gun.magin.SoundId = "rbxassetid://1684276943"
+                        player.Gun.magout.SoundId = "rbxassetid://1684277138"
+                    end
+                    if player.EquippedTool.Value == "AWP" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://2753888131"
+                        player.Gun.bolt.SoundId = "rbxassetid://1684277591"
+                        player.Gun.boltin.SoundId = "rbxassetid://1684277363"
+                        player.Gun.maghit.SoundId = "rbxassetid://1684277814"
+                        player.Gun.magin.SoundId = "rbxassetid://1684278055"
+                        player.Gun.magout.SoundId = "rbxassetid://1684278254"
+                        player.Gun.Zoom.SoundId = "rbxassetid://2862871544"
+                        player.Gun.Zoom.PlaybackSpeed = 1
+                    end
+                    if player.EquippedTool.Value == "G3SG1" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://340365815"
+                        player.Gun.bolt.SoundId = "rbxassetid://1684285559"
+                        player.Gun.boltin.SoundId = "rbxassetid://1684285841"
+                        player.Gun.maghit.SoundId = "rbxassetid://777244606"
+                        player.Gun.magin.SoundId = "rbxassetid://1684286087"
+                        player.Gun.magout.SoundId = "rbxassetid://1684286303"
+                    player.Gun.Zoom.SoundId = "rbxassetid://1684300267"
+                        player.Gun.Zoom.PlaybackSpeed = 1
+                    end
+                    if player.EquippedTool.Value == "MAC10" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://242422782"
+                        player.Gun.bolt.SoundId = "rbxassetid://1684293112"
+                        player.Gun.boltin.SoundId = "rbxassetid://1684293359"
+                        player.Gun.maghit.SoundId = "rbxassetid://1183581737"
+                        player.Gun.magin.SoundId = "rbxassetid://1684292666"
+                        player.Gun.magout.SoundId = "rbxassetid://1684292928"
+                    end
+                    if player.EquippedTool.Value == "SawedOff" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://1158047483"
+                        player.Gun.bolt.SoundId = "rbxassetid://222889105"
+                        player.Gun.insert1.SoundId = "rbxassetid://1657167530"
+                        player.Gun.insert2.SoundId = "rbxassetid://1657167827"
+                        player.Gun.insert3.SoundId = "rbxassetid://1657168103"
+                        player.Gun.insert4.SoundId = "rbxassetid://1657167530"
+                        player.Gun.insert5.SoundId = "rbxassetid://1657167827"
+                    end
+                    if player.EquippedTool.Value == "CZ" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://458727115"
+                        player.Gun.magin.SoundId = "rbxassetid://1684284159"
+                        player.Gun.magout.SoundId = "rbxassetid://1684284647"
+                        player.Gun.slide.SoundId = "rbxassetid://1684284931"
+                        player.Gun.slidein.SoundId = "rbxassetid://1684285158"
+                    end
+                    if player.EquippedTool.Value == "Nova" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://206953213"
+                        player.Gun.bolt.SoundId = "rbxassetid://206953217"
+                        player.Gun.insert1.SoundId = "rbxassetid://1657167530"
+                        player.Gun.insert2.SoundId = "rbxassetid://1657167827"
+                        player.Gun.insert3.SoundId = "rbxassetid://1657168103"
+                        player.Gun.insert4.SoundId = "rbxassetid://1657167530"
+                        player.Gun.insert5.SoundId = "rbxassetid://1657167827"
+                    end
+                    if player.EquippedTool.Value == "XM" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://202918888"
+                        player.Gun.bolt.SoundId = "rbxassetid://361445424"
+                        player.Gun.boltin.SoundId = "rbxassetid://361445427"
+                        player.Gun.insert1.SoundId = "rbxassetid://1657167530"
+                        player.Gun.insert2.SoundId = "rbxassetid://1657167827"
+                        player.Gun.insert3.SoundId = "rbxassetid://1657168103"
+                        player.Gun.insert4.SoundId = "rbxassetid://1657167530"
+                        player.Gun.insert5.SoundId = "rbxassetid://1657167827"
+                    end
+                    if player.EquippedTool.Value == "MAG7" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://395724758"
+                        player.Gun.maghit.SoundId = "rbxassetid://515216161"
+                        player.Gun.magin.SoundId = "rbxassetid://395724624"
+                        player.Gun.magout.SoundId = "rbxassetid://395724665"
+                        player.Gun.pump.SoundId = "rbxassetid://206953217"
+                    end
+            
+                    if player.EquippedTool.Value == "Negev" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://396243767"
+                        player.Gun.bolt.SoundId = "rbxassetid://1158042711"
+                        player.Gun.boltin.SoundId = "rbxassetid://1158042903"
+                        player.Gun.bullets.SoundId = "rbxassetid://1158043093"
+                        player.Gun.lidclose.SoundId = "rbxassetid://1158044531"
+                        player.Gun.lidopen.SoundId = "rbxassetid://1158044816"
+                        player.Gun.magin.SoundId = "rbxassetid://1158045048"
+                        player.Gun.magout.SoundId = "rbxassetid://1158045203"
+                    end
+            
+                    if player.EquippedTool.Value == "SG" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://347270113"
+                        player.Gun.bolt.SoundId = "rbxassetid://1684300765"
+                        player.Gun.boltin.SoundId = "rbxassetid://1684301039"
+                        player.Gun.magin.SoundId = "rbxassetid://1684301939"
+                        player.Gun.magout.SoundId = "rbxassetid://1684302178"
+                    end
+                    if player.EquippedTool.Value == "T Knife" then
+                        player.Gun.Shoot1.SoundId = "rbxassetid://1665637464"
+                        player.Gun.Shoot2.SoundId = "rbxassetid://1665637740"
+                    end
+                    if player.EquippedTool.Value == "CT Knife" then
+                        player.Gun.Shoot1.SoundId = "rbxassetid://1665637464"
+                        player.Gun.Shoot2.SoundId = "rbxassetid://1665637740"
+                    end
+                    if player.EquippedTool.Value == "M4A4" then
+                        player.Gun.Equip.SoundId = "rbxassetid://1665638797"
+                        player.Gun.Shoot.SoundId = "rbxassetid://202918741"
+                        player.Gun.bolt.SoundId = "rbxassetid://1684291592"
+                        player.Gun.boltin.SoundId = "rbxassetid://1684291797"
+                        player.Gun.boltrelease.SoundId = "rbxassetid://1684291797"
+                        player.Gun.magin.SoundId = "rbxassetid://1684292119"
+                        player.Gun.magout.SoundId = "rbxassetid://1684292401"
+                    end
+                    if player.EquippedTool.Value == "FiveSeven" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://212374232"
+                        player.Gun.magin.SoundId = "rbxassetid://1684284159"
+                        player.Gun.magout.SoundId = "rbxassetid://1684284647"
+                        player.Gun.slide.SoundId = "rbxassetid://1684284931"
+                        player.Gun.slidein.SoundId = "rbxassetid://1684285158"
+                    end
+                    if player.EquippedTool.Value == "Tec9" then
+                        player.Gun.Shoot.SoundId = "rbxassetid://206953317"
+                        player.Gun.bolt.SoundId = "rbxassetid://206953330"
+                        player.Gun.boltin.SoundId = "rbxassetid://206953326"
+                        player.Gun.magin.SoundId = "rbxassetid://206953325"
+                        player.Gun.magout.SoundId = "rbxassetid://206953321"
+                        player.Gun.Shoot.TimePosition = 0
+                    end
+                    if player.EquippedTool.Value == "R8" then
+                         player.Gun.Shoot.SoundId = "rbxassetid://3292861902"
+                    player.Gun.Shoot.PlaybackSpeed = 1
+                    end
+                end)
+        end)
+    else
+        OldGunSounds:Disconnect()
+    end
+end})
+misc2:addToggle({text = "Show Watermark",flag = "watermark_enabled",callback = function(val) aloraWatermark.Visible = val end})
+misc2:addToggle({text = "Show Bomb Info",flag = "bomb_vitals",callback = function(val) bombText.Visible = val end})
+misc2:addToggle({text = "Show Spectators",flag = "spec_list",callback = function(val) speclistText.Visible = val end})
+misc2:addList({text = "Hit Sound",flag = "hitsound_value",values = {"Rust","Skeet","Neverlose","Minecraft","jewelxx","hexx","krxxxk","slots","sonic"}})
+--misc2:addButton({text = "Set HP to 1", callback = function() game.ReplicatedStorage.Events.FallDamage:FireServer(localPlayer.Character.Humanoid.Health-1) end})
+misc2:addSlider({text = "Backtrack Time",flag = "backtrack_time",value = 500,min = 1,max = 2000})
+misc2:addSlider({text = "Backtrack Transparency",flag = "backtrack_transparency",value = 75,min = 0,max = 100})
+misc2:addSlider({text = "Hitsound Volume",flag = "hitsound_volume",value = 2,min = 1,max = 10})
+
+waypointFrame.Visible = false
+RecFrame1.Visible = false
+RecFrame2.Visible = false
+movementFrame.Visible = false
+local miscTabToggle = true
+toggleTab:addButton({text = "Toggle Tabs",callback = function()
+    miscTabToggle = not miscTabToggle
+    movementFrame.Visible =  not miscTabToggle
+    waypointFrame.Visible = not miscTabToggle
+    miscFrame.Visible = miscTabToggle
+    miscFrame2.Visible  = miscTabToggle
+    RecFrame1.Visible = not miscTabToggle
+    RecFrame2.Visible = not miscTabToggle
+end})
+
+
+local rifles,rifleFrame = skinsTab:createGroup(0)
+local snipers,sniperFrame = skinsTab:createGroup(1)
+
+local pistols,pistolFrame = skinsTab:createGroup(0)
+local knife,knifeFrame = skinsTab:createGroup(1)
+
+local skinToggle,skinToggleFrame = skinsTab:createGroup(0)
+
+rifles:addToggle({text = "AK47 Models", flag = "ak_skin"})
+rifles:addList({text = "Skin", flag = "selected_ak", values = {"Disabled","Default", "Aquamarine Revenge","Asiimov","Bloodsport","Case Hardened","Chromatic Abberation","Dragon","Hallows","Legion of Anubis","Neon Rider","Nightmare","Redline","Team Cringe","True King","Vulcan","Wild Lotus"}, callback = runAK }) 
+rifles:addList({text = "Model", flag = "selected_ak2",values = {"Disabled","Default","Pearl I","Pearl II","Ivory","funeral's"}, callback = runAK }) 
+rifles:addList({text = "Legacy", flag = "selected_ak3", values = {"Disabled","Default","Elite Build","Fuel Injector","Illumina","Neon Revolution","Phantom Disruptor","Point Disarray","Rat Rod","The Empress","Wasteland Rebel","X-Ray"}, callback = runAK})
+rifles:addDivider()
+
+snipers:addToggle({text = "AWP Models", flag = "awp_skin"}) 
+snipers:addList({text = "Skin", flag = "selected_awp", values = {"Disabled","Default","Ancient Dragon","Cosmos","Christmas","Chromatic Abberation","Dragon Lore","Gungnir","Prince","Megumin","Mecha Dragon","Sea Creature","Oni Taiji","Hyper Beast","Twitch","Nerf","Chan"}, callback = runAWP }) 
+snipers:addList({text = "Model", flag = "selected_awp2",values = {"Disabled","Default","Codol","Freedom","Forsaken Operator","Barrett","BSW-460","+ Silencer"}, callback = runAWP }) 
+snipers:addList({text = "Legacy", flag = "selected_awp3",values = {"Disabled","Default","Asiimov","Exoskeleton","Fever Dream","Hyper Beast","Mortis"}, callback = runAWP}) 
+snipers:addDivider() 
+snipers:addToggle({text = "Scout Models", flag = "SSG_skin"}) 
+snipers:addList({text = "Skins", flag = "selected_ssg", values = {"Disabled","Default"}, callback = runSSG}) 
+snipers:addList({text = "Models", flag = "selected_ssg2", values = {"Disabled", "Default", "Legacy Fever Dream", "Newan", "Outlaw"}, callback = runSSG}) 
+
+pistols:addToggle({text = "Desert Eagle Models", flag = "deagle_skin"}) 
+pistols:addList({text = "Skin", flag = "selected_deagle", values = {"Disabled","Default","Black Dragon King", "Code Red", "City", "Crimson Snake", "Dragon King", "Enraged Dragon", "1648 White"}, callback = runDeagle}) 
+pistols:addList({text = "Model", flag = "selected_deagle2", values = {"Disabled", "Default", "Cyber"}, callback = runDeagle})
+
+knife:addToggle({text = "Knife Models", flag = "changeKnife"})
+knife:addList({text = "Your Knife", flag = "knife_type", values = {"Default","Bayonet","Butterfly Knife","Falchion Knife","Gut Knife","Huntsman Knife","Karambit"}})
+knife:addList({text = "Knives", flag = "selected_knife",values = {"Default","Darkheart","Shadow Daggers","funeral's","Illumina","Ban Hammer","Fists","Butterfly Vanilla","Butterfly Sapphire","Butterfly Ruby","Butterfly Bloodwidow","Butterfly Twitch","Butterfly Hallows"}})
+knife:addButton({text = "Load", callback = function() runKnife() end})
+
+local skinTabToggle = true
+skinToggle:addButton({text = "Toggle Tabs", callback = function()
+    skinTabToggle = not skinTabToggle
+    rifleFrame.Visible  =  skinTabToggle
+    pistolFrame.Visible =  skinTabToggle
+    sniperFrame.Visible =  skinTabToggle
+    knifeFrame.Visible = not skinTabToggle
+end})
+
+knifeFrame.Visible  = false
+
+function runKnife()
+    if library.flags["changeKnife"] then
+        if library.flags["selected_knife"] == "Darkheart" then
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]:Destroy()
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]:Destroy()
+            else
+                game.ReplicatedStorage.Viewmodels["v_".. library.flags["knife_type"]]:Destroy()
+            end
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9754357997')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9754357997')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_Darkheart"].Name = "v_CT Knife"
+                game.ReplicatedStorage.Viewmodels["v_Darkheart"].Name = "v_T Knife"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"].Handle.TextureID = "rbxassetid://7911043090"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"].Handle.TextureID = "rbxassetid://7911043090"
+            else
+                game.ReplicatedStorage.Viewmodels["v_Darkheart"].Name = "v_".. library.flags["knife_type"]
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]].Handle.TextureID = "rbxassetid://7911043090"
+            end
+        elseif library.flags["selected_knife"] == "Shadow Daggers" then
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]:Destroy()
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]:Destroy()
+            else
+                game.ReplicatedStorage.Viewmodels["v_".. library.flags["knife_type"]]:Destroy()
+            end
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9765232669')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9765232669')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["Shadow Daggers"].Name = "v_CT Knife"
+                game.ReplicatedStorage.Viewmodels["Shadow Daggers"].Name = "v_T Knife"
+            else
+                game.ReplicatedStorage.Viewmodels["Shadow Daggers"].Name = "v_".. library.flags["knife_type"]
+            end
+        elseif library.flags["selected_knife"] == "Ban Hammer" then
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]:Destroy()
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]:Destroy()
+            else
+                game.ReplicatedStorage.Viewmodels["v_".. library.flags["knife_type"]]:Destroy()
+            end
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://6558454823')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://6558454823')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            wait()
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_Ban Hammer"].Name = "v_CT Knife"
+                game.ReplicatedStorage.Viewmodels["v_Ban Hammer"].Name = "v_T Knife"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"].Handle.TextureID = "rbxassetid://7911043090"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"].Handle.TextureID = "rbxassetid://7911043090"
+            else
+                game.ReplicatedStorage.Viewmodels["v_Ban Hammer"].Name = "v_".. library.flags["knife_type"]
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]].Handle.TextureID = "rbxassetid://7911043090"
+            end
+        elseif library.flags["selected_knife"] == "Illumina" then
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]:Destroy()
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]:Destroy()
+            else
+                game.ReplicatedStorage.Viewmodels["v_".. library.flags["knife_type"]]:Destroy()
+            end
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://6551595860')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://6551595860')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            wait()
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_Illumina"].Name = "v_CT Knife"
+                game.ReplicatedStorage.Viewmodels["v_Illumina"].Name = "v_T Knife"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"].Handle.TextureID = "rbxassetid://7911043090"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"].Handle.TextureID = "rbxassetid://7911043090"
+            else
+                game.ReplicatedStorage.Viewmodels["v_Illumina"].Name = "v_".. library.flags["knife_type"]
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]].Handle.TextureID = "rbxassetid://7911043090"
+            end
+        elseif library.flags["selected_knife"] == "Fists" then
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]:Destroy()
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]:Destroy()
+            else
+                game.ReplicatedStorage.Viewmodels["v_".. library.flags["knife_type"]]:Destroy()
+            end
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://6855487373')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://6855487373')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            wait()
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_Fisticuffs"].Name = "v_CT Knife"
+                game.ReplicatedStorage.Viewmodels["v_Fisticuffs"].Name = "v_T Knife"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"].Handle.TextureID = "rbxassetid://7911043090"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"].Handle.TextureID = "rbxassetid://7911043090"
+            else
+                game.ReplicatedStorage.Viewmodels["v_Fisticuffs"].Name = "v_".. library.flags["knife_type"]
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]].Handle.TextureID = "rbxassetid://7911043090"
+            end
+        elseif library.flags["selected_knife"] == "Butterfly Vanilla" then
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]:Destroy()
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]:Destroy()
+            else
+                game.ReplicatedStorage.Viewmodels["v_".. library.flags["knife_type"]]:Destroy()
+            end
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9764897331')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9764897331')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            wait()
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Vanilla"].Name = "v_CT Knife"
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Vanilla"].Name = "v_T Knife"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://9639644440"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://9639644440"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://9639644440"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://9639644440"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://9639644440"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://9639644440"
+            else
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Vanilla"].Name = "v_".. library.flags["knife_type"]
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_LHandle"].TextureID = "rbxassetid://9639644440"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_RHandle"].TextureID = "rbxassetid://9639644440"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_Blade"].TextureID = "rbxassetid://9639644440"
+            end
+        elseif library.flags["selected_knife"] == "Butterfly Sapphire" then
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]:Destroy()
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]:Destroy()
+            else
+                game.ReplicatedStorage.Viewmodels["v_".. library.flags["knife_type"]]:Destroy()
+            end
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9764912815')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9764912815')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Sapphire"].Name = "v_CT Knife"
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Sapphire"].Name = "v_T Knife"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://6568014567"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://6568014567"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://6568014567"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://6568014567"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://6568014567"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://6568014567"
+            else
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Sapphire"].Name = "v_".. library.flags["knife_type"]
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_LHandle"].TextureID = "rbxassetid://6568014567"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_RHandle"].TextureID = "rbxassetid://6568014567"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_Blade"].TextureID = "rbxassetid://6568014567"
+            end
+        elseif library.flags["selected_knife"] == "Butterfly Ruby" then
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]:Destroy()
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]:Destroy()
+            else
+                game.ReplicatedStorage.Viewmodels["v_".. library.flags["knife_type"]]:Destroy()
+            end
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9764920083')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9764920083')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Ruby"].Name = "v_CT Knife"
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Ruby"].Name = "v_T Knife"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+            else
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Ruby"].Name = "v_".. library.flags["knife_type"]
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+            end
+        elseif library.flags["selected_knife"] == "Butterfly Bloodwidow" then
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]:Destroy()
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]:Destroy()
+            else
+                game.ReplicatedStorage.Viewmodels["v_".. library.flags["knife_type"]]:Destroy()
+            end
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9764917617')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9764917617')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Bloodwidow"].Name = "v_CT Knife"
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Bloodwidow"].Name = "v_T Knife"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+            else
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Bloodwidow"].Name = "v_".. library.flags["knife_type"]
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+            end
+        elseif library.flags["selected_knife"] == "Butterfly Twitch" then
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]:Destroy()
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]:Destroy()
+            else
+                game.ReplicatedStorage.Viewmodels["v_".. library.flags["knife_type"]]:Destroy()
+            end
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9764914860')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9764914860')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Twitch"].Name = "v_CT Knife"
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Twitch"].Name = "v_T Knife"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+            else
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Twitch"].Name = "v_".. library.flags["knife_type"]
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+            end
+        elseif library.flags["selected_knife"] == "Butterfly Hallows" then
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]:Destroy()
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]:Destroy()
+            else
+                game.ReplicatedStorage.Viewmodels["v_".. library.flags["knife_type"]]:Destroy()
+            end
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9764948637')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9764948637')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Hallows"].Name = "v_CT Knife"
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Hallows"].Name = "v_T Knife"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+            else
+                game.ReplicatedStorage.Viewmodels["v_Butterfly Hallows"].Name = "v_".. library.flags["knife_type"]
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+            end
+        elseif library.flags["selected_knife"] == "funeral's" then
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]:Destroy()
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]:Destroy()
+            else
+                game.ReplicatedStorage.Viewmodels["v_".. library.flags["knife_type"]]:Destroy()
+            end
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9765743046')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9765743046')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            if library.flags["knife_type"] == "Default" then
+                game.ReplicatedStorage.Viewmodels["funeral's Butterfly"].Name = "v_CT Knife"
+                game.ReplicatedStorage.Viewmodels["funeral's Butterfly"].Name = "v_T Knife"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_CT Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_T Knife"]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+            else
+                game.ReplicatedStorage.Viewmodels["funeral's Butterfly"].Name = "v_".. library.flags["knife_type"]
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_LHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_RHandle"].TextureID = "rbxassetid://841632940"
+                game.ReplicatedStorage.Viewmodels["v_"..library.flags["knife_type"]]["Butterfly_Blade"].TextureID = "rbxassetid://841632940"
+            end
         end
     end
-end})
-otherGroup2:addButton({text = "Unlock All Skins",callback = function() 
-    if not unlockInventory then
-        unlockInventory = true
-        client.CurrentInventory = skins
-        local TClone, CTClone = localPlayer.SkinFolder.TFolder:Clone(),localPlayer.SkinFolder.CTFolder:Clone()
-        localPlayer.SkinFolder.TFolder:Destroy();localPlayer.SkinFolder.CTFolder:Destroy()
-        TClone.Parent = localPlayer.SkinFolder;CTClone.Parent = localPlayer.SkinFolder
+end
+
+function setAWP()
+    if game.ReplicatedStorage["Viewmodels"]:FindFirstChild("v_AWP", true) then
+	game.ReplicatedStorage.Viewmodels["v_AWP"]:Destroy()
+    	wait()
+    	local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+    	game:GetObjects('rbxassetid://7311298463')[1].Parent = Model1
+    	Model = game.ReplicatedStorage.Viewmodels.Model
+    	for _, Child in pairs(Model:GetChildren()) do
+    	    Child.Parent = Model.Parent
+    	end
+    	Model:Destroy()
+	end
+end
+
+function  runAWP()
+    if library.flags["awp_skin"] then
+        if library.flags["selected_awp"] == "Default" then
+		    setAWP()
+        elseif library.flags["selected_awp"] == "Ancient Dragon" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://6668821785"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://6668822961"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://6668821785"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://6668821785"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://6668821785"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://6668821785"
+        elseif library.flags["selected_awp"] == "Cosmos" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://6451643445"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://6451642429"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://6451643445"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://6451643445"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://6451643445"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://6451643445"
+        elseif library.flags["selected_awp"] == "Christmas" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://6476855964"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://6476856340"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://6476855964"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://6476855964"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://6476855964"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://6476855964"
+        elseif library.flags["selected_awp"] == "Chromatic Abberation" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://6585694311"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://6585692708"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://6585694311"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://6585694311"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://6585694311"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://6585694311"
+        elseif library.flags["selected_awp"] == "Dragon Lore" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://6451539744"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://6451541040"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://6451539744"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://6451539744"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://6451539744"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://6451539744"
+        elseif library.flags["selected_awp"] == "Gungnir" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://6559063434"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://6561080965"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://6559063434"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://6559063434"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://6559063434"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://6559063434"
+        elseif library.flags["selected_awp"] == "Prince" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://6439619884"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://6439621097"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://6439619884"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://6439619884"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://6439619884"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://6439619884"
+        elseif library.flags["selected_awp"] == "Megumin" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://6439622192"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://6439622719"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://6439622192"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://6439622192"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://6439622192"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://6439622192"
+        elseif library.flags["selected_awp"] == "Mecha Dragon" then
+            	--AWP Mecha Dragon
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://6451200990"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://6451199638"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://6451200990"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://6451200990"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://6451200990"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://6451200990"
+        elseif library.flags["selected_awp"] == "Sea Creature" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://6451112581"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://6451107022"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://6451112581"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://6451112581"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://6451112581"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://6451112581"
+        elseif library.flags["selected_awp"] == "Oni Taiji" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://6451254361"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://6451255146"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://6451254361"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://6451254361"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://6451254361"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://6451254361"
+        elseif library.flags["selected_awp"] == "Hyper Beast" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://6576205981"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://6576207672"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://6576205981"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://6576205981"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://6576205981"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://6576205981"
+        elseif library.flags["selected_awp"] == "Twitch" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://7826240654"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://7826242521"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://7826240654"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://7826240654"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://7826240654"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://7826240654"
+        elseif library.flags["selected_awp"] == "Nerf" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://7701405678"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://7701407577"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://7701405678"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://7701405678"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://7701405678"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://7701405678"
+        elseif library.flags["selected_awp"] == "Redline" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://6657425659"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://6657426143"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://6657425659"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://6657425659"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://6657425659"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://6657425659"
+        elseif library.flags["selected_awp"] == "Chan" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = "rbxassetid://9478416651"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = "rbxassetid://9478417089"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = "rbxassetid://9478416651"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = "rbxassetid://9478416651"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = "rbxassetid://9478416651"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = "rbxassetid://9478416651"
+        elseif library.flags["selected_awp2"] == "Default" then
+            setAWP()
+        elseif library.flags["selected_awp2"] == "Codol" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://7161371614')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["v_codol"].Name = "v_AWP"
+        elseif library.flags["selected_awp2"] == "Freedom" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://7161374917')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["v_freedomawp"].Name = "v_AWP"
+        elseif library.flags["selected_awp2"] == "Forsaken Operator" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9470996900')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["v_sniper01234"].Name = "v_AWP"
+        elseif library.flags["selected_awp2"] == "BSW-460" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9470974218')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["v_sniper09876"].Name = "v_AWP"
+        elseif library.flags["selected_awp2"] == "Barrett" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://6477308219')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["v_Barrett"].Name = "v_AWP"
+        elseif library.flags["selected_awp2"] == "+ Silencer" then
+            if game.CoreGui:FindFirstChild("BF_Values", true) then
+                if game.CoreGui["BF_Values"]:FindFirstChild("AWPsilencer_Handle", true) and game.CoreGui["BF_Values"]:FindFirstChild("AWPsilencer_Scope", true) and game.CoreGui["BF_Values"]:FindFirstChild("AWPsilencer_Mag", true) and game.CoreGui["BF_Values"]:FindFirstChild("AWPsilencer_Barrel", true) and game.CoreGui["BF_Values"]:FindFirstChild("AWPsilencer_Slide", true) and game.CoreGui["BF_Values"]:FindFirstChild("AWPsilencer_Slide 2", true) then
+                    game.CoreGui["BF_Values"]["AWPsilencer_Handle"].Value = game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID
+                    game.CoreGui["BF_Values"]["AWPsilencer_Scope"].Value = game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID
+                    game.CoreGui["BF_Values"]["AWPsilencer_Mag"].Value = game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID
+                    game.CoreGui["BF_Values"]["AWPsilencer_Barrel"].Value = game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID
+                    game.CoreGui["BF_Values"]["AWPsilencer_Slide"].Value = game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID
+                    game.CoreGui["BF_Values"]["AWPsilencer_Slide 2"].Value = game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID
+                else
+                    local TEMPVALUE_AWPsilencer_Handle = Instance.new("StringValue")
+                    TEMPVALUE_AWPsilencer_Handle.Parent = game.CoreGui["BF_Values"]
+                    TEMPVALUE_AWPsilencer_Handle.Name = "AWPsilencer_Handle"
+                    local TEMPVALUE_AWPsilencer_Scope = Instance.new("StringValue")
+                    TEMPVALUE_AWPsilencer_Scope.Parent = game.CoreGui["BF_Values"]
+                    TEMPVALUE_AWPsilencer_Scope.Name = "AWPsilencer_Scope"
+                    local TEMPVALUE_AWPsilencer_Mag = Instance.new("StringValue")
+                    TEMPVALUE_AWPsilencer_Mag.Parent = game.CoreGui["BF_Values"]
+                    TEMPVALUE_AWPsilencer_Mag.Name = "AWPsilencer_Mag"
+                    local TEMPVALUE_AWPsilencer_Barrel = Instance.new("StringValue")
+                    TEMPVALUE_AWPsilencer_Barrel.Parent = game.CoreGui["BF_Values"]
+                    TEMPVALUE_AWPsilencer_Barrel.Name = "AWPsilencer_Barrel"
+                    local TEMPVALUE_AWPsilencer_Slide = Instance.new("StringValue")
+                    TEMPVALUE_AWPsilencer_Slide.Parent = game.CoreGui["BF_Values"]
+                    TEMPVALUE_AWPsilencer_Slide.Name = "AWPsilencer_Slide"
+                    local TEMPVALUE_AWPsilencer_Slide2 = Instance.new("StringValue")
+                    TEMPVALUE_AWPsilencer_Slide2.Parent = game.CoreGui["BF_Values"]
+                    TEMPVALUE_AWPsilencer_Slide2.Name = "AWPsilencer_Slide 2"
+                    wait()
+                    game.CoreGui["BF_Values"]["AWPsilencer_Handle"].Value = game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID
+                    game.CoreGui["BF_Values"]["AWPsilencer_Scope"].Value = game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID
+                    game.CoreGui["BF_Values"]["AWPsilencer_Mag"].Value = game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID
+                    game.CoreGui["BF_Values"]["AWPsilencer_Barrel"].Value = game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID
+                    game.CoreGui["BF_Values"]["AWPsilencer_Slide"].Value = game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID
+                    game.CoreGui["BF_Values"]["AWPsilencer_Slide 2"].Value = game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID
+                end
+            end
+            game.ReplicatedStorage.Viewmodels["v_AWP"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9495457932')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["v_AWPsilencer"].Name = "v_AWP"
+            if game.CoreGui:FindFirstChild("BF_Values", true) then
+                if game.CoreGui["BF_Values"]:FindFirstChild("AWPsilencer_Handle", true) and game.CoreGui["BF_Values"]:FindFirstChild("AWPsilencer_Scope", true) and game.CoreGui["BF_Values"]:FindFirstChild("AWPsilencer_Mag", true) and game.CoreGui["BF_Values"]:FindFirstChild("AWPsilencer_Barrel", true) and game.CoreGui["BF_Values"]:FindFirstChild("AWPsilencer_Slide", true) and game.CoreGui["BF_Values"]:FindFirstChild("AWPsilencer_Slide 2", true) then
+                    game.ReplicatedStorage.Viewmodels["v_AWP"]["Handle"].TextureID = game.CoreGui["BF_Values"]["AWPsilencer_Handle"].Value
+                    game.ReplicatedStorage.Viewmodels["v_AWP"]["Scope"].TextureID = game.CoreGui["BF_Values"]["AWPsilencer_Scope"].Value
+                    game.ReplicatedStorage.Viewmodels["v_AWP"]["Mag"].TextureID = game.CoreGui["BF_Values"]["AWPsilencer_Mag"].Value
+                    game.ReplicatedStorage.Viewmodels["v_AWP"]["Barrel"].TextureID = game.CoreGui["BF_Values"]["AWPsilencer_Barrel"].Value
+                    game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide"].TextureID = game.CoreGui["BF_Values"]["AWPsilencer_Slide"].Value
+                    game.ReplicatedStorage.Viewmodels["v_AWP"]["Slide 2"].TextureID = game.CoreGui["BF_Values"]["AWPsilencer_Slide 2"].Value
+                end
+            end
+	    elseif library.flags["selected_awp3"] == "Default" then
+            setAWP()
+        elseif library.flags["selected_awp3"] == "Asiimov" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161319343")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["awpAZIM"].Name = "v_AWP"
+        elseif library.flags["selected_awp3"] == "Exoskeleton" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161321940")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["awpSKELETON"].Name = "v_AWP"
+        elseif library.flags["selected_awp3"] == "Fever Dream" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161324501")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["awpCOLORLY"].Name = "v_AWP"
+        elseif library.flags["selected_awp3"] == "Hyper Beast" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161317771")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["awpSPEED"].Name = "v_AWP"
+            game.ReplicatedStorage.Viewmodels["v_AWP"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161317771")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["awpSPEED"].Name = "v_AWP"
+        elseif library.flags["selected_awp3"] == "Mortis" then
+            game.ReplicatedStorage.Viewmodels["v_AWP"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161315948")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["awpMORTIS"].Name = "v_AWP"
+        end
     end
-end})
-otherGroup2:addSlider({text = "Backtrack Time",flag = "backtrack_time",value = 500,min = 1,max = 2000})
-otherGroup2:addSlider({text = "Backtrack Transparency",flag = "backtrack_transparency",value = 75,min = 0,max = 100})
-otherGroup2:addSlider({text = "Hitsound Volume",flag = "hitsound_volume",value = 2,min = 1,max = 10})
+end
+
+function setAK()
+    if game.ReplicatedStorage["Viewmodels"]:FindFirstChild("v_AK47", true) then
+        game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+        wait()
+        local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+        game:GetObjects('rbxassetid://7311297308')[1].Parent = Model1
+        Model = game.ReplicatedStorage.Viewmodels.Model
+        for _, Child in pairs(Model:GetChildren()) do
+            Child.Parent = Model.Parent
+        end
+        Model:Destroy()
+    else
+        local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+        game:GetObjects('rbxassetid://7311297308')[1].Parent = Model1
+        Model = game.ReplicatedStorage.Viewmodels.Model
+        for _, Child in pairs(Model:GetChildren()) do
+            Child.Parent = Model.Parent
+        end
+        Model:Destroy()
+    end
+end
+function runAK()
+    if library.flags["ak_skin"] then
+        if library.flags["selected_ak"] == "Default" then
+            setAK()
+	    elseif library.flags["selected_ak"] == "True King" then
+    		game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://9639567189"
+    		game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://9639567980"
+    		game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://9639565755"
+	    elseif library.flags["selected_ak"] == "Hallows" then
+    		game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://7826367064"
+    		game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://7826367064"
+    		game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://7826367064"
+        elseif library.flags["selected_ak"] == "Asiimov" then
+        --AK47 Asiimov
+    		game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://6698314618"
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://6698316807"
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://6820836083"
+        elseif library.flags["selected_ak"] == "Aquamarine Revenge" then
+	    --AK47 Aquamarine Revenge
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://6448558943"
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://6448557262"
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://6448560045"
+        elseif library.flags["selected_ak"] == "Bloodsport" then
+	    --AK47 Bloodsport
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://6698325103"
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://6698327498"
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://6698326376"
+        elseif library.flags["selected_ak"] == "Case Hardened" then
+        --AK47 Case Hardened
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://9438683416"
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://9438683416"
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://9438683416"
+        elseif library.flags["selected_ak"] == "Chromatic Abberation" then
+        --AK47 Chromatic Abberation
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://6585686554"
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://6585685092"
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://6585687653"
+        elseif library.flags["selected_ak"] == "Wild Lotus" then
+        --AK47 Wild Lotus
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://6451260038"
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://6451261292"
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://6451260682"
+        elseif library.flags["selected_ak"] == "Vulcan" then
+        --AK47 Vulcan
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://6698167994"
+    	    	game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://6698170295"
+    	    	game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://6698169370"
+	    elseif library.flags["selected_ak"] == "Neon Rider" then
+    		game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://6451119080"
+    		game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://6451120406"
+    		game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://6451117699"
+        elseif library.flags["selected_ak"] == "Redline" then
+        --AK47 Redline
+            game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://6663268904"
+            game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://6663270884"
+            game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://6663270220"
+        elseif library.flags["selected_ak"] == "Dragon" then
+        --AK47 Dragon
+    	    game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://6525737160"
+    	    game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://6525735946"
+    	    game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://6525738132"
+	    elseif library.flags["selected_ak"] == "Legion of Anubis" then
+    	    game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://6451429545"
+    	    game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://6476838768"
+    	    game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://6451427955"
+        elseif library.flags["selected_ak"] == "Nightmare" then
+        --AK47 Nightmare
+    	    game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://6667790295"
+    	    game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://6667791939"
+    	    game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://6667791440"
+        elseif library.flags["selected_ak"] == "Team Cringe" then
+        --AK47 Pure Webs
+    	    game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://6698420309"
+    	    game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://6698422340"
+    	    game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://6698421135"
+        elseif library.flags["selected_ak2"] == "Default" then
+		setAK()
+        elseif library.flags["selected_ak2"] == "Pearl I" then
+        --AK47 | Pearl (1)
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+	        local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+	        game:GetObjects('rbxassetid://7161341595')[1].Parent = Model1
+	        Model = game.ReplicatedStorage.Viewmodels.Model
+	        for _, Child in pairs(Model:GetChildren()) do
+	        	Child.Parent = Model.Parent
+	        end
+	        Model:Destroy()
+	        game.ReplicatedStorage.Viewmodels["v_AK47pearl1"].Name = "v_AK47"
+        elseif library.flags["selected_ak2"] == "Pearl II" then
+         --AK47 | Pearl (2)
+        	game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+	        local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+	        game:GetObjects('rbxassetid://7161342268')[1].Parent = Model1
+	        Model = game.ReplicatedStorage.Viewmodels.Model
+	        for _, Child in pairs(Model:GetChildren()) do
+	        	Child.Parent = Model.Parent
+	        end
+	        Model:Destroy()
+	        game.ReplicatedStorage.Viewmodels["v_AK47pearl2"].Name = "v_AK47"
+        elseif library.flags["selected_ak2"] == "Ivory" then
+            --AK47 | Dragon
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+	        local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+	        game:GetObjects('rbxassetid://7161345483')[1].Parent = Model1
+	        Model = game.ReplicatedStorage.Viewmodels.Model
+	        for _, Child in pairs(Model:GetChildren()) do
+	        	Child.Parent = Model.Parent
+	        end
+	        Model:Destroy()
+	        game.ReplicatedStorage.Viewmodels["v_AK47drangon"].Name = "v_AK47"
+        elseif library.flags["selected_ak2"] == "funeral's" then
+            --AK47 | Dragon
+	        game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+	        local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+	        game:GetObjects('rbxassetid://9766269711')[1].Parent = Model1
+	        Model = game.ReplicatedStorage.Viewmodels.Model
+	        for _, Child in pairs(Model:GetChildren()) do
+	        	Child.Parent = Model.Parent
+	        end
+	        Model:Destroy()
+	        game.ReplicatedStorage.Viewmodels["funeral's AK47"].Name = "v_AK47"
+        elseif library.flags["selected_ak3"] == "Default" then
+		setAK()
+        elseif library.flags["selected_ak3"] == "Elite Build" then
+            game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161299883")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["ak56MYST"].Name = "v_AK47"
+        elseif library.flags["selected_ak3"] == "Fuel Injector" then
+            game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161300720")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["ak56"].Name = "v_AK47"
+        elseif library.flags["selected_ak3"] == "Illumina" then
+            game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161296580")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["ak5671"].Name = "v_AK47"
+            game.ReplicatedStorage.Viewmodels["v_AK47"]["Handle"].TextureID = "rbxassetid://7661848565"
+            game.ReplicatedStorage.Viewmodels["v_AK47"]["Bolt"].TextureID = "rbxassetid://7661848565"
+            game.ReplicatedStorage.Viewmodels["v_AK47"]["Mag"].TextureID = "rbxassetid://7661848565"
+        elseif library.flags["selected_ak3"] == "Neon Revolution" then
+            game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161306673")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["ak47anarchy"].Name = "v_AK47"
+        elseif library.flags["selected_ak3"] == "Phantom Disruptor" then
+            game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161304751")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["ak56MONT"].Name = "v_AK47"
+        elseif library.flags["selected_ak3"] == "Point Disarray" then
+            game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161293019")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["ak56COLOR"].Name = "v_AK47"
+        elseif library.flags["selected_ak3"] == "Rat Rod" then
+            game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161296580")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["ak5671"].Name = "v_AK47"
+        elseif library.flags["selected_ak3"] == "The Empress" then
+            game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161303311")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["ak47imper"].Name = "v_AK47"
+        elseif library.flags["selected_ak3"] == "Wasteland Rebel" then
+            game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161298128")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["ak471"].Name = "v_AK47"
+        elseif library.flags["selected_ak3"] == "X-Ray" then
+            game.ReplicatedStorage.Viewmodels["v_AK47"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects("rbxassetid://7161294918")[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["ak56RAY"].Name = "v_AK47"
+        end
+     end
+end
+
+function setDeagle()
+    if game.ReplicatedStorage["Viewmodels"]:FindFirstChild("v_DesertEagle", true) then
+        game.ReplicatedStorage.Viewmodels["v_DesertEagle"]:Destroy()
+        wait()
+        local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+        game:GetObjects('rbxassetid://7311314077')[1].Parent = Model1
+        Model = game.ReplicatedStorage.Viewmodels.Model
+        for _, Child in pairs(Model:GetChildren()) do
+            Child.Parent = Model.Parent
+        end
+        Model:Destroy()
+    else
+        local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+        game:GetObjects('rbxassetid://7311314077')[1].Parent = Model1
+        Model = game.ReplicatedStorage.Viewmodels.Model
+        for _, Child in pairs(Model:GetChildren()) do
+            Child.Parent = Model.Parent
+        end
+        Model:Destroy()
+    end
+end
+ 
+ function runDeagle()
+    if library.flags["deagle_skin"] then
+        if library.flags["selected_deagle"] == "Default" then
+            setDeagle()
+        elseif library.flags["selected_deagle"] == "Black Dragon King" then
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Handle"].TextureID = "rbxassetid://9639670980"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Slide"].TextureID = "rbxassetid://9639670980"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag 2"].TextureID = "rbxassetid://9639670980"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag"].TextureID = "rbxassetid://9639670980"
+        elseif library.flags["selected_deagle"] == "Code Red" then
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Handle"].TextureID = "rbxassetid://6451093913"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Slide"].TextureID = "rbxassetid://6451093913"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag 2"].TextureID = "rbxassetid://6451093913"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag"].TextureID = "rbxassetid://6451093913"
+        elseif library.flags["selected_deagle"] == "City" then
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Handle"].TextureID = "rbxassetid://6458222794"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Slide"].TextureID = "rbxassetid://6458222794"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag 2"].TextureID = "rbxassetid://6458222794"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag"].TextureID = "rbxassetid://6458222794"
+        elseif library.flags["selected_deagle"] == "Crimson Snake" then
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Handle"].TextureID = "rbxassetid://6750924413"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Slide"].TextureID = "rbxassetid://6750924413"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag 2"].TextureID = "rbxassetid://6750924413"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag"].TextureID = "rbxassetid://6750924413"
+        elseif library.flags["selected_deagle"] == "Dragon King" then
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Handle"].TextureID = "rbxassetid://9639662171"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Slide"].TextureID = "rbxassetid://9639662171"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag 2"].TextureID = "rbxassetid://9639662171"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag"].TextureID = "rbxassetid://9639662171"
+        elseif library.flags["selected_deagle"] == "Enraged Dragon" then
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Handle"].TextureID = "rbxassetid://6794842359"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Slide"].TextureID = "rbxassetid://6794842359"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag 2"].TextureID = "rbxassetid://6794842817"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag"].TextureID = "rbxassetid://6794842817"
+	elseif library.flags["selected_deagle"] == "1648 White" then
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Handle"].TextureID = "rbxassetid://9640502933"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Slide"].TextureID = "rbxassetid://9640502933"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag 2"].TextureID = "rbxassetid://9640502933"
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]["Mag"].TextureID = "rbxassetid://9640502933"
+        elseif library.flags["selected_deagle2"] == "Default" then
+            setDeagle()
+        elseif library.flags["selected_deagle2"] == "Cyber" then
+            game.ReplicatedStorage.Viewmodels["v_DesertEagle"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9489668863')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+            Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["v_Deagle_cyber"].Name = "v_DesertEagle"
+        end
+    end
+end
+
+
+function setSSG()
+    if game.ReplicatedStorage["Viewmodels"]:FindFirstChild("v_Scout", true) then
+        game.ReplicatedStorage.Viewmodels["v_Scout"]:Destroy()
+        wait()
+        local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+        game:GetObjects('rbxassetid://7311362570')[1].Parent = Model1
+        Model = game.ReplicatedStorage.Viewmodels.Model
+        for _, Child in pairs(Model:GetChildren()) do
+            Child.Parent = Model.Parent
+        end
+        Model:Destroy()
+    else
+        local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+        game:GetObjects('rbxassetid://7311362570')[1].Parent = Model1
+        Model = game.ReplicatedStorage.Viewmodels.Model
+        for _, Child in pairs(Model:GetChildren()) do
+            Child.Parent = Model.Parent
+        end
+        Model:Destroy()
+    end
+end
+ 
+function runSSG()
+    if library.flags["SSG_skin"] then
+        if library.flags["selected_ssg2"] == "Default" then
+            setSSG()
+        elseif library.flags["selected_ssg2"] == "Legacy Fever Dream" then
+            game.ReplicatedStorage.Viewmodels["v_Scout"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://7161407697')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["v_Scoutfever"].Name = "v_Scout"
+        elseif library.flags["selected_ssg2"] == "Newan" then
+            game.ReplicatedStorage.Viewmodels["v_Scout"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://7161433164')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["v_Scoutnewan"].Name = "v_Scout"
+        elseif library.flags["selected_ssg2"] == "Outlaw" then
+            game.ReplicatedStorage.Viewmodels["v_Scout"]:Destroy()
+            local Model1 = Instance.new("Model", game.ReplicatedStorage.Viewmodels)
+            game:GetObjects('rbxassetid://9470925479')[1].Parent = Model1
+            Model = game.ReplicatedStorage.Viewmodels.Model
+            for _, Child in pairs(Model:GetChildren()) do
+                Child.Parent = Model.Parent
+            end
+            Model:Destroy()
+            game.ReplicatedStorage.Viewmodels["v_outlaw"].Name = "v_Scout"
+        end
+    end
+end
+
+workspace.Debris.ChildAdded:connect(function(obj)
+    checkdebris(obj)
+end)
+
+function checkdebris(obj)
+    spawn(function()
+        if obj.Name == 'Bullet' then
+            if library.flags["no_bullet"] == true then
+                obj:Destroy()
+            end
+        end
+    end)
+end
 
 local btFolder = Instance.new("Folder",workspace)
 players.PlayerAdded:Connect(function(plr)
@@ -982,6 +2432,7 @@ players.PlayerAdded:Connect(function(plr)
     local plrbtFolder = Instance.new("Folder",btFolder)
     plrbtFolder.Name = plr.Name
 end)
+
 for i,v in next, players:GetPlayers() do
     createEsp(v)
     if btFolder:FindFirstChild(v.Name) then return end
@@ -1002,8 +2453,68 @@ for i,v in next, hitsounds do
 end
 preloadSound:Destroy()
 
-camera.ChildAdded:Connect(function()
-    updateViewmodel()
+camera.ChildAdded:Connect(function(new)
+    spawn(function()
+        if new.Name == "Arms" and new:IsA("Model") then
+            for i,v in pairs(new:GetChildren()) do
+                if v:IsA("Model") and v:FindFirstChild("Right Arm") or v:FindFirstChild("Left Arm") then
+                    local RightArm = v:FindFirstChild("Right Arm") or nil
+                    local LeftArm = v:FindFirstChild("Left Arm") or nil
+
+                    local RightGlove = (RightArm and (RightArm:FindFirstChild("Glove") or RightArm:FindFirstChild("RGlove"))) or nil
+                    local LeftGlove = (LeftArm and (LeftArm:FindFirstChild("Glove") or LeftArm:FindFirstChild("LGlove"))) or nil
+
+                    local RightSleeve = RightArm and RightArm:FindFirstChild("Sleeve") or nil
+                    local LeftSleeve = LeftArm and LeftArm:FindFirstChild("Sleeve") or nil
+
+                    if library.flags["remove_gloves"] == true then
+                        if RightGlove ~= nil then
+                            RightGlove.Transparency = 1
+                        end
+                        if LeftGlove ~= nil then
+                            LeftGlove.Transparency = 1
+                        end
+                    end
+
+                    if library.flags["remove_sleeves"] == true then
+                        if RightSleeve ~= nil then
+                            RightSleeve.Transparency = 1
+                        end
+                        if LeftSleeve ~= nil then
+                            LeftSleeve.Transparency = 1
+                        end
+                    end
+                    if library.flags["remove_arms"] == true then
+                        if RightArm ~= nil then
+                            RightArm.Transparency = 1
+                        end
+                        if LeftArm ~= nil then
+                            LeftArm.Transparency = 1
+                        end
+                    end
+                elseif library.flags["weapon_chams"] == true and v:IsA("BasePart") and not table.find({"Right Arm", "Left Arm", "Flash"}, v.Name) and v.Transparency ~= 1 then
+                    if v:IsA("MeshPart") then v.TextureID = "" end
+                    if v:FindFirstChildOfClass("SpecialMesh") then v:FindFirstChildOfClass("SpecialMesh").TextureId = "" end
+                    v.Color = library.flags["weapon_color"]
+                    v.Material = library.flags["weapon_material"]
+                    v.Reflectance = library.flags["weap_refl"]*0.1
+                    v.Transparency = library.flags["weap_trans"]*0.1
+                end
+            end
+        end
+        if library.flags["ak_skin"] then
+            runAK()
+        end
+        if library.flags["awp_skin"] then
+            runAWP()
+        end
+        if library.flags["deagle_skin"] then
+            runDeagle()
+        end
+        if library.flags["SSG_skin"] then
+            runSSG()
+        end
+        end)
 end)
 
 local ebCooldown = false
@@ -1021,114 +2532,61 @@ btPart.CanCollide = false
 btPart.Anchored = true
 btPart.Name = "btp"
 
-local function has_value (tab, val)
-    for index, value in ipairs(tab) do
-        if value == val then
-            return true
-        end
+workspace.ChildAdded:Connect(function(new)
+	if new.Name == "C4" and new:IsA("Model") then
+        createESP(new)
     end
+end)
 
-    return false
-end
+local BombTimer = 40
+local sexinfo = "Bomb Vitals\nTimer: -\nSite: -"
 
-local Hitboxes = {
-"Head","UpperTorso", "LowerTorso", 
-"LeftUpperArm", "LeftLowerArm", 
-"LeftHand", "RightUpperArm", 
-"RightLowerArm","RightHand", 
-"LeftUpperLeg", "LeftLowerLeg", 
-"LeftFoot", "RightUpperLeg", 
-"RightLowerLeg", "RightFoot",
-"HeadHB"
-}
+workspace.ChildAdded:Connect(function(new)
+	if new.Name == "C4" and library.flags["bomb_vitals"] == true then
 
-local chams = function()
-    local p = players:GetPlayers()
-    for _, v in next, localPlayer.PlayerGui:GetChildren() do
-        if v:IsA('Folder') and ( game:GetService('Players'):FindFirstChild(v.Name) or v:FindFirstChildOfClass('BoxHandleAdornment') ) then
-            v:Destroy()
-        end
-    end
-    for _, v in next, p do
-        if v.Character ~= nil and v.Character:FindFirstChild('Head') ~= nil  then
-            if v.TeamColor ~= localPlayer.TeamColor then
-                if library.flags["ChamsEnemy"] then
-                    if v ~= localPlayer then
-                        local folder = Instance.new('Folder',localPlayer.PlayerGui)
-                        folder.Name = v.Name
-                        for _, part in pairs(v.Character:GetChildren()) do
-                            if part:IsA('BasePart') then
-                                 if has_value (Hitboxes, part.Name) then 
-                                    local adorn = Instance.new('BoxHandleAdornment',folder)
-                                    adorn.Name = v.Name
-                                    if part.Name ~= 'Head' then
-                                        adorn.Size = part.Size + Vector3.new(0.3,0.3,0.3)
-                                    end
-                                    adorn.Adornee = part
-                                    adorn.AlwaysOnTop =  false
-                                    adorn.ZIndex = 5
-                                    adorn.Transparency = library.flags["EnemyTrans"] / 100
-                                    adorn.Color = BrickColor.new(library.flags["EnemyColor"])
-                                    if library.flags["ChamsEnemyHidden"] then 
-                                        local adorn = Instance.new('BoxHandleAdornment',folder)
-                                        adorn.Name = v.Name
-                                        if part.Name ~= 'Head' then
-                                            adorn.Size = part.Size
-                                        end
-                                        adorn.Adornee = part
-                                        adorn.AlwaysOnTop =  part.Size + Vector3.new(0.5,0.5,0.5)
-                                        adorn.ZIndex = 5
-                                        adorn.Transparency = library.flags["HiddenEnemyTrans"] / 100
-                                        adorn.Color = BrickColor.new(library.flags["EnemyColorHidden"])
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            else
-                if library.flags["ChamsTeam"] then --team
-                    if v ~= localPlayer then
-                        local folder = Instance.new('Folder',localPlayer.PlayerGui)
-                        folder.Name = v.Name
-                        for _, part in pairs(v.Character:GetChildren()) do
-                            if part:IsA('BasePart') then
-                                if has_value (Hitboxes, part.Name) then 
-                                    local adorn = Instance.new('BoxHandleAdornment',folder)
-                                    adorn.Name = v.Name
-                                    if part.Name ~= 'Head' then
-                                        adorn.Size = part.Size + Vector3.new(0.3,0.3,0.3)
-                                    end
-                                    adorn.Adornee = part
-                                    adorn.AlwaysOnTop = false
-                                    adorn.ZIndex = 5
-                                    adorn.Transparency = library.flags["TeamTrans"] / 100
-                                    adorn.Color = BrickColor.new(library.flags["TeamColor"])
-                                    if library.flags["ChamsTeamHidden"] then 
-                                        local adorn = Instance.new('BoxHandleAdornment',folder)
-                                        adorn.Name = v.Name
-                                        if part.Name ~= 'Head' then
-                                            adorn.Size = part.Size + Vector3.new(0.5,0.5,0.5)
-                                        end
-                                        adorn.Adornee = part
-                                        adorn.AlwaysOnTop =  true
-                                        adorn.ZIndex = 5
-                                        adorn.Transparency = library.flags["HiddenTeamTrans"] / 100
-                                        adorn.Color = BrickColor.new(library.flags["TeamColorHidden"])
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
+        local fakebomb = Instance.new("Part")
+        fakebomb.Parent = new
+        fakebomb.Size = Vector3.new(1,1,1)
+        fakebomb.Anchored = true
+
+
+        new.PrimaryPart = fakebomb
+
+        local bombPlant = "-"
+
+		spawn(function()
+            if (new.PrimaryPart.Position - workspace.Map.SpawnPoints.C4Plant.Position).Magnitude > (new.PrimaryPart.Position - workspace.Map.SpawnPoints.C4Plant2.Position).Magnitude then
+                bombPlant = "A"
+            elseif (new.PrimaryPart.Position - workspace.Map.SpawnPoints.C4Plant2.Position).Magnitude > (new.PrimaryPart.Position - workspace.Map.SpawnPoints.C4Plant.Position).Magnitude then
+                bombPlant = "B"
             end
-        end
-    end
-end
+            
+            local highlight = Instance.new('Highlight',new)
+            highlight.FillTransparency = 0.7
+            highlight.FillColor = Color3.new(1,0,0)
+            highlight.OutlineTransparency = 1
+            highlight.OutlineColor = Color3.new(1,1,1)
+            highlight.Adornee = new
+            highlight.DepthMode = 'AlwaysOnTop'
+			repeat
+				wait(1)
+				BombTimer = BombTimer - 1
+                bombText.Text = "Bomb Vitals\nTimer: "..tostring(BombTimer.. "/40")
+                sexinfo = "Bomb Vitals\nTimer: "..tostring(BombTimer.. "/40").."\nSite: "..bombPlant
+			until BombTimer == 0 or workspace.Status.RoundOver.Value == true
+            wait(5)
+            sexinfo = "Bomb Vitals\nTimer: -\nSite: -"
+            BombTimer = 40
+		end)
+	end
+end)
+
 
 function onStep()
     silentPart = nil
     local spectators = {}
+    speclistText.Text = "Spectators"
+    bombText.Text = sexinfo
     local weapon = getWeaponInfo()
     if library.flags["esp_enabled"] then
         for playerName,esp in next, espObjects do
@@ -1152,26 +2610,26 @@ function onStep()
                         local middle = character["HumanoidRootPart"].CFrame
                         local smallestX,biggestX = 9e9,-9e9
                         local smallestY,biggestY = 9e9,-9e9
-    
+
                         local y = (middle.p-character["Head"].Position).magnitude + character["Head"].Size.Y/2
                         local x1 = (middle.p-character["LeftHand"].Position).magnitude
                         local x2 = (middle.p-character["LeftHand"].Position).magnitude
                         local minY1 = (middle.p-character["RightFoot"].Position).magnitude
                         local minY2 = (middle.p-character["LeftFoot"].Position).magnitude
-    
+
                         local minY = minY1 > minY2 and minY1 or minY2
                         local minX = x1 < x2 and x1 or x2
-    
+
                         local espOffsets = getOffsets(minX+character["LeftHand"].Size.X/2,y,minY+character["RightFoot"].Size.Y/2,character["HumanoidRootPart"].Size.Z/2)
                         for i,v in next, espOffsets do
                             local pos = camera:WorldToViewportPoint(middle * v.p)
                             if smallestX > pos.X then
-                                smallestX = pos.X 
+                                smallestX = pos.X
                             end
                             if biggestX < pos.X then
-                                biggestX = pos.X 
+                                biggestX = pos.X
                             end
-                        
+
                             if smallestY > pos.Y then
                                 smallestY = pos.Y
                             end
@@ -1179,7 +2637,7 @@ function onStep()
                                 biggestY = pos.Y
                             end
                         end
-                        
+
                         esp.box.Visible = library.flags["box_enabled"]
                         esp.boxol.Visible = library.flags["box_enabled"]
                         esp.boxil.Visible = library.flags["box_enabled"]
@@ -1195,10 +2653,10 @@ function onStep()
                         if true then
                             esp.box.Size = floor(Vector2.new(biggestX-smallestX,biggestY-smallestY))
                             esp.box.Position = floor(Vector2.new(smallestX,smallestY))
-                        
+
                             esp.boxol.Size = floor(Vector2.new(biggestX-smallestX,biggestY-smallestY) + Vector2.new(2,2))
                             esp.boxol.Position = floor(Vector2.new(smallestX,smallestY) - Vector2.new(1,1))
-                        
+
                             esp.boxil.Size = floor(Vector2.new(biggestX-smallestX,biggestY-smallestY) - Vector2.new(2,2))
                             esp.boxil.Position = floor(Vector2.new(smallestX,smallestY) + Vector2.new(1,1))
                         end
@@ -1211,7 +2669,7 @@ function onStep()
                         if true then
                             esp.healthbo.Size = floor(Vector2.new(4,(biggestY-smallestY)+2))
                             esp.healthbo.Position = floor(Vector2.new(smallestX-6,smallestY-1))
-    
+
                             esp.healthb.Size = floor(Vector2.new(2,(-player.Character.Humanoid.Health/100*(biggestY-smallestY))+3))
                             esp.healthb.Position = floor(Vector2.new(smallestX-5,smallestY+esp.healthbo.Size.Y-3))
                         end
@@ -1226,22 +2684,8 @@ function onStep()
             end
         end
     end
-    if ThirdPersonCheck then 
-        game.Players.LocalPlayer.CameraMaxZoomDistance = 15
-        game.Players.LocalPlayer.CameraMinZoomDistance = 15
-        for _,v in pairs(workspace.Camera:GetDescendants()) do 
-            pcall(function() 
-            v.Transparency=1
-            end)
-        end
-    else
-        game.Players.LocalPlayer.CameraMaxZoomDistance = 0
-        game.Players.LocalPlayer.CameraMinZoomDistance = 0
-    end
-
     if weapon.alive then
         local currentState = localPlayer.Character.Humanoid:GetState()
-        hookJp = library.flags["jump_bug"] and isButtonDown(library.flags["jb_bind"])
         if weapon.triggerbot and not triggerbotDebounce and isButtonDown(library.flags["trigger_keybind"]) then
             local raycastParams = RaycastParams.new();raycastParams.FilterType = Enum.RaycastFilterType.Blacklist;raycastParams.FilterDescendantsInstances = {camera,localPlayer.Character,workspace.Debris,workspace.Map.SpawnPoints}
             local raycastResult = workspace:Raycast(camera.CFrame.p, camera.CFrame.LookVector * 4096, raycastParams)
@@ -1280,11 +2724,16 @@ function onStep()
                         mousemoverel(-((mouse.X - partPos.X)/weapon.smoothness),-((mouse.Y - partPos.Y)/weapon.smoothness))
                     end
                     if weapon.silent_aim and distance <= weapon.silent_fov then
-                        silentPart = aimbotPart
+                        local hitchance = math.random(0,100)
+                        print(hitchance)
+                        if hitchance <= library.flags["hitchance"] then 
+                            silentPart = aimbotPart
+                        end
                     end
                 end
             end
         end
+
         if library.flags["edge_bug"] and not ebCooldown and isButtonDown(library.flags["eb_bind"]) then
             if oldState == Enum.HumanoidStateType.Freefall and currentState == Enum.HumanoidStateType.Landed then
                 ebCooldown = true
@@ -1294,14 +2743,19 @@ function onStep()
                 end
                 wait()
                 localPlayer.Character.HumanoidRootPart.Velocity *= Vector3.new(1.8,1,1.8)
+                if library.flags["EbSoundToggle"] == true then
+                    local hitsound = Instance.new("Sound",workspace)
+                    hitsound.SoundId = hitsounds[library.flags["EBsoundValue"]]
+                    hitsound.PlayOnRemove = true
+                    hitsound.Volume = library.flags["EBSoundVolume"]
+                    hitsound:Destroy()
+                end
                 spawn(function()
                     wait(0.075)
                     ebCooldown = false
                 end)
             end
         end
-
-        
 
         oldState = currentState
         local btTime = library.flags["backtrack_time"]/1000
@@ -1321,31 +2775,36 @@ function onStep()
                             bt.Size = v.Character.Head.Size - Vector3.new(0.025,0.025,0.025)
                             bt.CFrame = v.Character.Head.CFrame
                             bt.Parent = btFolder[v.Name]
-            
+
+                            local bt2 = btPart:Clone()
+                            bt2.read.Value = v.Character
+                            bt2.Transparency = trans
+                            bt2.Size = v.Character.UpperTorso.Size - Vector3.new(0.025,0.025,0.025)
+                            bt2.CFrame = v.Character.UpperTorso.CFrame
+                            bt2.Parent = btFolder[v.Name]
+
+
                             debris:AddItem(bt,btTime)
+                            debris:AddItem(bt2,btTime)
                         end
                     end)
                 end
             end
-            speclistText.Text = "Spectators"
             if not isAlive(v) then
                 if library.flags["spec_list"] and plrPos and v:FindFirstChild("CameraCF") then
-                    if (v.CameraCF.Value.p-plrPos).magnitude < 20 then 
+                    if (v.CameraCF.Value.p-plrPos).magnitude < 20 then
                         speclistText.Text = speclistText.Text.."\n"..v.Name
                     end
                 end
             end
         end
     end
-    if not library.flags["drawing_enabled"] or not library.flags["velo_graph"] then
-        for i,v in ipairs(lines) do
-            v:Remove()
-            table.remove(lines,i)
-        end
+    if library.flags["remove_recoil"] then
+        client.RecoilX = 0
+        client.RecoilY = 0
+        client.resetaccuracy()
     end
-    if library.flags["remove_radio"] then
-        localPlayer.PlayerGui.GUI.SuitZoom.Visible = false
-    end
+    localPlayer.PlayerGui.GUI.SuitZoom.Visible = false
     if library.flags["world_gradient"] then
         lighting.Ambient = library.flags["gradient_color"]
         lighting.OutdoorAmbient = library.flags["outdoor_gradient_color"]
@@ -1353,19 +2812,7 @@ function onStep()
         lighting.Ambient = oldAmbient
         lighting.OutdoorAmbient = oldOutdoorAmbient
     end
-    if library.flags["remove_recoil"] then
-        client.RecoilX = 0
-        client.RecoilY = 0
-        client.resetaccuracy()
-    end
-    local ver = "0.0.3"
-    wIndicator.Visible = library.flags["drawing_enabled"] and library.flags["wasd_indicator"]
-    aIndicator.Visible = library.flags["drawing_enabled"] and library.flags["wasd_indicator"]
-    sIndicator.Visible = library.flags["drawing_enabled"] and library.flags["wasd_indicator"]
-    dIndicator.Visible = library.flags["drawing_enabled"] and library.flags["wasd_indicator"]
-    spaceIndicator.Visible = library.flags["drawing_enabled"] and library.flags["wasd_indicator"]
-    ctrlIndicator.Visible = library.flags["drawing_enabled"] and library.flags["wasd_indicator"]
-    veloIndicator.Visible = library.flags["velo_graph"] and library.flags["drawing_enabled"]
+
     lighting.TimeOfDay = library.flags["time_changer"] and library.flags["time_value"]/2 or lighting.TimeOfDay
     localPlayer.Cash.Value = library.flags["inf_cash"] and 16000 or localPlayer.Cash.Value
     if library.flags["watermark_enabled"] then
@@ -1377,26 +2824,223 @@ function onStep()
     end
 end
 
+game:GetService('RunService').RenderStepped:Connect(function()
+    for _, player in pairs(players:GetPlayers()) do
+        if player.Team ~= localPlayer.Team and player.Status.Alive.Value == true and not player.Character:FindFirstChild('Highlight') then
+            local highlight = Instance.new('Highlight',player.Character)
+            highlight.FillTransparency = innerTransparency
+            highlight.FillColor = color
+            highlight.OutlineTransparency = outlineTransparency
+            highlight.OutlineColor = color2
+            highlight.Adornee = player.Character
+            highlight.DepthMode = depthMode
+        end
+        if player.Status.Alive.Value == true then
+            if player.Team == localPlayer.Team or library.flags["highlights"] == false then
+                if player.Character:FindFirstChild('Highlight') then
+                    player.Character.Highlight.Enabled = false
+                end
+            else
+                if player.Character:FindFirstChild('Highlight') then
+                    player.Character.Highlight.Enabled = true
+                end
+            end
+        end
+    end
+end)
+
+game.Players.LocalPlayer.Additionals.TotalDamage.Changed:Connect(function(val)
+	if current == 0 then return end
+	coroutine.wrap(function()
+		if library.flags["hitmarkers"] then
+			local Line = Drawing.new("Line")
+			local Line2 = Drawing.new("Line")
+			local Line3 = Drawing.new("Line")
+			local Line4 = Drawing.new("Line")
+
+			local x, y = camera.ViewportSize.X/2, camera.ViewportSize.Y/2
+
+			Line.From = Vector2.new(x + 4, y + 4)
+			Line.To = Vector2.new(x + 10, y + 10)
+			Line.Color = library.flags["hmcolor"]
+			Line.Visible = true
+
+			Line2.From = Vector2.new(x + 4, y - 4)
+			Line2.To = Vector2.new(x + 10, y - 10)
+			Line2.Color = library.flags["hmcolor"]
+			Line2.Visible = true
+
+			Line3.From = Vector2.new(x - 4, y - 4)
+			Line3.To = Vector2.new(x - 10, y - 10)
+			Line3.Color = library.flags["hmcolor"]
+			Line3.Visible = true
+
+			Line4.From = Vector2.new(x - 4, y + 4)
+			Line4.To = Vector2.new(x - 10, y + 10)
+			Line4.Color = library.flags["hmcolor"]
+			Line4.Visible = true
+
+			Line.Transparency = 1
+			Line2.Transparency = 1
+			Line3.Transparency = 1
+			Line4.Transparency = 1
+
+			Line.Thickness = 1
+			Line2.Thickness = 1
+			Line3.Thickness = 1
+			Line4.Thickness = 1
+
+			wait(0.3)
+			for i = 1,0,-0.1 do
+				wait()
+				Line.Transparency = i
+				Line2.Transparency = i
+				Line3.Transparency = i
+				Line4.Transparency = i
+			end
+			Line:Remove()
+			Line2:Remove()
+			Line3:Remove()
+			Line4:Remove()
+		end
+	end)()
+end)
+
+--files
+HttpService = game:GetService("HttpService")
+CurrentRecording = {}
+local ISRECORDING = false
+
+if not isfolder("recorder-cb/") then
+    makefolder("recorder-cb")
+end
+
+if not isfolder("recorder-cb/"..tostring(game.GameId)) then
+    makefolder("recorder-cb/"..tostring(game.GameId))
+end
+
+function GetPlayerRoot()
+    if game.GameId == 115797356 then -- CB
+        return game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+    else
+        if game.GameId == 1861504796 then -- bhop/surf
+            return workspace['Characters'][game.Players.LocalPlayer.Name].HumanoidRootPart.CFrame
+        else
+            if game.GameId == 2162282815 then -- Rush Point
+                return game:GetService("Workspace").MapFolder.Players[game.Players.LocalPlayer.Name].HumanoidRootPart.CFrame
+            else
+                return game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+            end
+        end
+    end
+end
+function MovePlayer(args)
+    if game.GameId == 115797356 then -- CB
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = args
+    else
+        if game.GameId == 1861504796 then -- bhop/surf
+            workspace['Characters'][game.Players.LocalPlayer.Name].HumanoidRootPart.CFrame = args
+        else
+            if game.GameId == 2162282815 then -- Rush Point
+                game:GetService("Workspace").MapFolder.Players[game.Players.LocalPlayer.Name].HumanoidRootPart.CFrame = args
+            else
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = args
+            end
+        end
+    end
+end
+function GetMap()
+    local map = nil
+    if game.GameId == 115797356 then
+        if game.Workspace:FindFirstChild("Map") then
+            map = game.Workspace.Map.Origin.Value
+        else
+            map = ""
+        end
+    else
+        map = ""
+    end
+    return map
+end
+RecordingsGroup:addList({text = "Recordings",flag = "selected_recording",skipflag = true,values = {}})
+function Play()
+    local recording = library.flags['selected_recording']
+    
+    local Decoded = game:GetService("HttpService"):JSONDecode(readfile(recording))
+    
+    for i,v in pairs(Decoded) do
+        local X = v['X']
+        local Y = v['Y']
+        local Z = v['Z']
+        
+        local Pos = CFrame.new(X,Y,Z)
+        
+        MovePlayer(Pos)
+        wait()
+    end
+end
+function UpdateList()   
+    local TheThings = {}
+    for i,v in pairs(listfiles("recorder-cb/"..tostring(game.GameId).."/")) do
+        table.insert(TheThings, v)
+    end
+    library.options["selected_recording"].refresh(TheThings)
+end
+FinishedRecording = ""
+RecorderGroup:addTextbox({text = "Recording Name",flag = "recordingName"})
+RecorderGroup:addButton({text = "Start Recording",callback = function()
+    ISRECORDING = true
+    CurrentRecording = {}
+    while ISRECORDING do wait()
+        table.insert(CurrentRecording,
+    		{X = GetPlayerRoot().X, Y = GetPlayerRoot().Y, Z = GetPlayerRoot().Z}
+    	)
+    	if not ISRECORDING then break end
+    end
+    wait(1)
+end})
+RecorderGroup:addButton({text = "End Recording",callback = function()
+    ISRECORDING = false
+    print(FinishedRecording)
+    writefile("recorder-cb/"..tostring(game.GameId).."/"..GetMap().."_"..library.flags['recordingName']..".bin", HttpService:JSONEncode(CurrentRecording))
+    UpdateList()
+end})
+RecorderGroup:addButton({text = "Play Selected Recording",callback = function()
+    if library.flags['selected_recording'] ~= nil then
+       Play() 
+    end
+end})
+RecorderGroup:addButton({text = "Refresh Recordings",callback = function()
+    UpdateList()
+end})
+
+local SaveSpot
+waypointGroup:addKeybind({text = "Save Waypoint",flag = "savewaypoint",key = Enum.KeyCode.P,callback = function()
+    print("Saved")
+    SaveSpot = GetPlayerRoot()
+    print(SaveSpot)
+end})
+waypointGroup:addKeybind({text = "Load Waypoint",flag = "loadwaypoint",key = Enum.KeyCode.L, callback = function()
+    print("Loaded")
+    MovePlayer(SaveSpot)
+end})
+
+-- Quick Thing
+if GetMap() ~= nil then
+    UpdateList()
+end
+
+--HexagonK
+client.splatterBlood = function() end
+
 runService.RenderStepped:Connect(onStep)
 spawn(function()
     while wait() do
         timeout -= 1
     end
 end)
-spawn(function()
-    while wait() do 
-        wait(library.flags["ChamsDelay"])
-        if library.flags["ChamsEnabled"] then 
-            chams()
-        end
-    end
-end)
-
 while wait(5) do
     if library.flags["skybox_changer"] then
         updateSkybox()
     end
 end
-
-getgenv().Loading = false
-game:GetService("CoreGui"):FindFirstChild("sjorlib").Enabled = true
