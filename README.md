@@ -1,2 +1,2 @@
 # Old-Counterblox-Projects
-Used as a repo for old cb projects i worked on, that are no longer in development. There not good and where used for learning the lua lauange. 
+A place that I use to store old counter blox projects. It has both source codes for popular cheats along with some self codes. Dont expect for any of these to work anymore.
