@@ -160,8 +160,8 @@ local function QWELJX_fake_script() -- Inject.LocalScript
 	
 	Button.MouseButton1Down:Connect(function()
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/KnownUnknown420/Counter-Blox-Cheats/main/FInite.lua/Main.lua"))()
-		local NIGGERNIGGERNIGGERNIGGERNIGGERNIGGER = script.Parent.Parent.Parent.Main
-		NIGGERNIGGERNIGGERNIGGERNIGGERNIGGER:Destroy()
+		local CoolAwsomePart = script.Parent.Parent.Parent.Main
+		CoolAwsomePart:Destroy()
 	end)
 	
 end
@@ -178,10 +178,10 @@ local function MTOXUA_fake_script() -- JoinDiscord.LocalScript
 	local Button = script.Parent
 	
 	Button.MouseButton1Down:Connect(function()
-		setclipboard("https://discord.gg/ZDT8c4Q3AY")
-		Button.Text = "Copied to clipboard"
-		wait(2)
-		Button.Text = "Join Discord"
+		-- setclipboard("https://discord.gg/ZDT8c4Q3AY")
+		--Button.Text = "Copied to clipboard"
+		--wait(2)
+		--Button.Text = "Join Discord"
 	end)
 end
 coroutine.wrap(MTOXUA_fake_script)()
